@@ -1,0 +1,24 @@
+const fileModel = require('../models/File');
+
+
+const create = async (payload) => {
+  try {
+    const data = {
+      originalName: payload?.originalname,
+      mimeType: payload?.mimetype,
+      size: payload?.size,
+      path: payload?.path,
+      fileUrl: `/uploads/${payload?.filename}`
+    };
+
+    const file = await fileModel.create(data);
+    return file;
+  } catch (e) {
+    await httpErrorService.create(e, 'Upload file Service');    
+    return null;
+  }
+};
+
+module.exports = {
+  create
+};

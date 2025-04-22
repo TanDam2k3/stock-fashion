@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Tạo sản phẩm với ảnh</title>
+    <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+    }
+
+    input, button {
+      display: block;
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px;
+    }
+
+    img {
+      max-width: 100%;
+      margin-top: 10px;
+    }
+
+    #result {
+      white-space: pre-wrap;
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 6px;
+    }
+  </style>
+  </head>
+  <body>
+
+    <h2>Tạo sản phẩm mới</h2>
+
+    <form id="productForm">
+      <input type="text" name="housewareId" placeholder="Houseware ID" required
+        value="6805e7667813e603966f22cf" />
+      <input type="text" name="name" placeholder="Tên sản phẩm" required
+        value="Áo" />
+      <input type="text" name="type" placeholder="Loại" required value="ao" />
+      <input type="number" name="quantity" placeholder="Số lượng" required
+        value="10" />
+      <input type="file" name="image" accept="image/*" required />
+      <button type="submit">Tạo sản phẩm</button>
+    </form>
+
+    <img id="preview" style="display:none;" />
+    <div id="result"></div>
+
+    <script>
+    const form = document.getElementById('productForm');
+    const resultDiv = document.getElementById('result');
+    const preview = document.getElementById('preview');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      resultDiv.innerHTML = 'Đang xử lý...';
+
+      const formData = new FormData(form);
+      const imageFile = formData.get('image');
+
+      // Step 1: Upload file
+      const fileUploadForm = new FormData();
+      fileUploadForm.append('file', imageFile);
+
+      try {
+        const fileRes = await fetch('http://localhost:5000/api/files/upload', {
+          method: 'POST',
+          body: fileUploadForm,
+          headers: {
+            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MDVlZWMyODliNTIxM2M3MTIwMmNjMCIsInJvbGUiOiJzdGFmZiIsImlhdCI6MTc0NTIxOTM3MCwiZXhwIjoxNzQ1ODI0MTcwfQ.DwaaJX1jyGzpjk2DTTI_mnYnkJLgWES_zLyitfiJy1I`
+          }
+        });
+
+        const fileData = await fileRes.json();
+
+        if (!fileRes.ok) throw new Error(fileData.message || 'Lỗi upload ảnh');
+
+        // Hiển thị ảnh preview
+        preview.src = 'http://localhost:5000' + fileData.file.fileUrl;
+        preview.style.display = 'block';
+
+        const productPayload = {
+          housewareId: formData.get('housewareId'),
+          name: formData.get('name'),
+          type: formData.get('type'),
+          quantity: Number(formData.get('quantity')),
+          fileId: fileData.file._id,
+          fileUrl: fileData.file.fileUrl
+        };
+
+        // Step 2: Gửi request tạo product
+        const productRes = await fetch('http://localhost:5000/api/products/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MDVlZWMyODliNTIxM2M3MTIwMmNjMCIsInJvbGUiOiJzdGFmZiIsImlhdCI6MTc0NTIxOTM3MCwiZXhwIjoxNzQ1ODI0MTcwfQ.DwaaJX1jyGzpjk2DTTI_mnYnkJLgWES_zLyitfiJy1I`
+          },
+          body: JSON.stringify(productPayload)
+        });
+
+
+        const productData = await productRes.json();
+        if (!productRes.ok) throw new Error(productData.message || 'Lỗi tạo sản phẩm');
+
+        resultDiv.innerHTML = `✅ Sản phẩm tạo thành công:\n` + JSON.stringify(productData.product, null, 2);
+
+      } catch (err) {
+        resultDiv.innerHTML = `<span style="color:red;">❌ ${err.message}</span>`;
+      }
+    });
+  </script>
+
+  </body>
+</html>
