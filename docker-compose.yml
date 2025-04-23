@@ -10,6 +10,8 @@ services:
       - app-network
     depends_on:
       - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/fashionstock
 
   user:
     build:
@@ -28,6 +30,8 @@ services:
       - mongo-data:/data/db
     networks:
       - app-network
+    ports:
+      - "27017:27017"
 
 networks:
   app-network:
