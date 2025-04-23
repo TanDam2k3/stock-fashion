@@ -1,5 +1,15 @@
 version: "3.8"
 services:
+  mongo:
+    image: mongo:7.0
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
+    ports:
+      - "27017:27017"
+    restart: always
+
   api:
     build:
       context: .
@@ -24,16 +34,6 @@ services:
       - app-network
     depends_on:
       - mongo
-    restart: always
-
-  mongo:
-    image: mongo:7.0
-    volumes:
-      - mongo-data:/data/db
-    networks:
-      - app-network
-    ports:
-      - "27017:27017"
     restart: always
 
 networks:
