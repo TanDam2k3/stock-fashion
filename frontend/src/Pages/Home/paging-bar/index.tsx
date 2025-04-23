@@ -1,15 +1,15 @@
 // import Pagination from "@mui/material/Pagination";
 // import Stack from "@mui/material/Stack";
-import { useNavigate, useSearchParams } from "react-router-dom";
+// import { useNavigate, useSearchParams } from "react-router-dom";
 import { memo } from 'react';
 
 interface PagingBarProps {
     totalPage: number;
 }
 const PagingBar: React.FC<PagingBarProps> = ({totalPage}) => {
-    const navigate = useNavigate();
-    const [params] = useSearchParams();
-
+    // const navigate = useNavigate();
+    // const [params] = useSearchParams();
+console.log(totalPage);
     return (
         <div className="w-full h-full py-2 flex justify-center items-center">
             {/* <Stack spacing={2}>

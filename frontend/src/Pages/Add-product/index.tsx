@@ -150,37 +150,37 @@ const AddProduct: React.FC = () => {
     }
   };
 
-  const handleSaveAllToLocalStorage = () => {
-    if (products.length === 0) {
-      alert("No products to save!");
-      return;
-    }
+  // const handleSaveAllToLocalStorage = () => {
+  //   if (products.length === 0) {
+  //     alert("No products to save!");
+  //     return;
+  //   }
 
-    if (window.confirm(`Are you sure you want to save all ${products.length} products to localStorage and clear the table?`)) {
-      try {
-        // Get existing products from localStorage or initialize empty array
-        const existingProducts = JSON.parse(localStorage.getItem('savedProducts') || '[]');
+  //   if (window.confirm(`Are you sure you want to save all ${products.length} products to localStorage and clear the table?`)) {
+  //     try {
+  //       // Get existing products from localStorage or initialize empty array
+  //       const existingProducts = JSON.parse(localStorage.getItem('savedProducts') || '[]');
         
-        // Create new array with existing and current products
-        const updatedProducts = [...existingProducts, ...products.map(product => {
-          // Remove the imagePreview as it's a blob URL that won't persist
-          const { imagePreview, ...productWithoutPreview } = product;
-          return productWithoutPreview;
-        })];
+  //       // Create new array with existing and current products
+  //       const updatedProducts = [...existingProducts, ...products.map(product => {
+  //         // Remove the imagePreview as it's a blob URL that won't persist
+  //         const { imagePreview, ...productWithoutPreview } = product;
+  //         return productWithoutPreview;
+  //       })];
         
-        // Save to localStorage
-        localStorage.setItem('savedProducts', JSON.stringify(updatedProducts));
+  //       // Save to localStorage
+  //       localStorage.setItem('savedProducts', JSON.stringify(updatedProducts));
         
-        // Clear the table
-        handleClearAllProducts();
+  //       // Clear the table
+  //       handleClearAllProducts();
         
-        alert(`Successfully saved ${products.length} products to localStorage!`);
-      } catch (error) {
-        console.error("Error saving to localStorage:", error);
-        alert("Failed to save products to localStorage. Please try again.");
-      }
-    }
-  };
+  //       alert(`Successfully saved ${products.length} products to localStorage!`);
+  //     } catch (error) {
+  //       console.error("Error saving to localStorage:", error);
+  //       alert("Failed to save products to localStorage. Please try again.");
+  //     }
+  //   }
+  // };
 
   return (
     <div className="w-full rounded-md bg-white flex items-center flex-col gap-5 p-5"> 

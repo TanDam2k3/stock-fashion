@@ -1,5 +1,5 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
-import ProductsTable from "../../components/add-product/table/tableAddProduct";
+// import ProductsTable from "../../components/add-product/table/tableAddProduct";
 
 interface HousewareFormData {
   name: string;

@@ -1,11 +1,11 @@
 import { useState, Suspense } from "react";
 import { Outlet } from "react-router-dom";
 import LoadingPage from "./PagesState/LoadingPage";
-import useWindowDimensions from "../hook/useWindowDimension";
+// import useWindowDimensions from "../hook/useWindowDimension";
 import Sidebar from "./Sidebar";
 
 const Layout = () => {
-  const { width } = useWindowDimensions();
+  // const { width } = useWindowDimensions();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
