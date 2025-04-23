@@ -12,6 +12,7 @@ services:
       - mongo
     environment:
       - MONGO_URI=mongodb://mongo:27017/fashionstock
+    restart: always
 
   user:
     build:
@@ -23,6 +24,7 @@ services:
       - app-network
     depends_on:
       - mongo
+    restart: always
 
   mongo:
     image: mongo:7.0
@@ -32,6 +34,7 @@ services:
       - app-network
     ports:
       - "27017:27017"
+    restart: always
 
 networks:
   app-network:
