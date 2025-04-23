@@ -1,18 +1,21 @@
-# Chọn image Node.js cơ sở
-FROM node:18-alpine
-
-# Thiết lập thư mục làm việc trong container
+# Build stage
+FROM node:18-alpine as builder
 WORKDIR /usr/src/app
 
-# Copy package.json và cài đặt dependencies
+# Copy package.json -> cài dependencies
 COPY frontend/package*.json ./
-RUN npm install --production
+RUN npm install
 
-# Copy mã nguồn của User
+# Copy toàn bộ code React
 COPY ./frontend ./frontend
+WORKDIR /usr/src/app/frontend
 
-# Expose port mà User service lắng nghe
-EXPOSE 5001
+# Build ứng dụng
+RUN npm run build
 
-# Lệnh khởi động khi container bắt đầu chạy
-CMD ["node", "frontend/index.js"]
+# Production stage: serve bằng nginx
+FROM nginx:stable-alpine
+COPY --from=builder /usr/src/app/frontend/build /usr/share/nginx/html
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
