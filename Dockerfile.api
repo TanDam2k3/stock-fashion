@@ -1,18 +1,23 @@
-# Chọn image Node.js cơ sở
+# Use official Node.js image as base image
 FROM node:18-alpine
 
-# Thiết lập thư mục làm việc trong container
+# Set the working directory inside the container
 WORKDIR /usr/src/app
 
-# Copy package.json và cài đặt dependencies
+# Copy package.json and package-lock.json first (for caching)
 COPY api/package*.json ./
-RUN npm install --production
 
-# Copy mã nguồn của API
-COPY ./api ./api
+# Install dependencies
+RUN npm install
 
-# Expose port mà API lắng nghe
+# Copy the rest of the application
+COPY api/ ./
+
+# Build ứng dụng
+RUN npm run build
+
+# Expose port 5000 for API
 EXPOSE 5000
 
-# Lệnh khởi động khi container bắt đầu chạy
+# Start the API server
 CMD ["npm", "start"]
