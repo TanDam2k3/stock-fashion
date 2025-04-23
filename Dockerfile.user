@@ -5,14 +5,14 @@ FROM node:18-alpine
 WORKDIR /usr/src/app
 
 # Copy package.json và cài đặt dependencies
-COPY user/package*.json ./
+COPY frontend/package*.json ./
 RUN npm install --production
 
 # Copy mã nguồn của User
-COPY ./user ./user
+COPY ./frontend ./frontend
 
 # Expose port mà User service lắng nghe
 EXPOSE 5001
 
 # Lệnh khởi động khi container bắt đầu chạy
-CMD ["node", "user/index.js"]
+CMD ["node", "frontend/index.js"]
