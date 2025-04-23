@@ -1,0 +1,37 @@
+version: "3.8"
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api # Chỉ định Dockerfile cho API
+    ports:
+      - "5000:5000" # Map port 3000 của container sang port 3000 của máy host
+    networks:
+      - app-network
+    depends_on:
+      - mongo
+
+  user:
+    build:
+      context: .
+      dockerfile: Dockerfile.user # Chỉ định Dockerfile cho User
+    ports:
+      - "5001:5001" # Map port 3001 của container sang port 3001 của máy host
+    networks:
+      - app-network
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:7.0
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
