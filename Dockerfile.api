@@ -15,4 +15,4 @@ COPY ./api ./api
 EXPOSE 5000
 
 # Lệnh khởi động khi container bắt đầu chạy
-CMD ["node", "api/index.js"]
+CMD ["npm", "start"]
