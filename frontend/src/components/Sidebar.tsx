@@ -100,8 +100,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 
       <nav className="mt-2">
         <ul>
-          {menuItem(<FaHome />, "Tổng quan", "/")}
-          {menuItem(<IoIosAddCircle />, "Thêm", undefined, () =>
+        {menuItem(<FaHome />, "Tổng quan", "/app")}
+        {menuItem(<IoIosAddCircle />, "Thêm", undefined, () =>
   toggleDropdown("add"), true, "add"
 )}
 
@@ -113,7 +113,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
           )}
           {menuItem(<FaBoxes />, "Kho hàng", "/warehouse")}
    
-          {menuItem(<GiClothes  />,  "Sản phẩm", "/")}
+          {menuItem(<GiClothes />, "Sản phẩm", "products")}
           
 
 

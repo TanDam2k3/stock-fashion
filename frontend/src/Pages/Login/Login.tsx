@@ -9,7 +9,6 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
     try {
       // Giả lập gọi API
       const fakeLoginApi = (username: string, password: string) =>
@@ -35,7 +34,9 @@ const Login: React.FC = () => {
     }
   };
   
-
+  const handleSignUp = () => {
+    navigate("/register");
+  };
   return (
     <div className="bg-white min-h-screen flex items-center justify-center p-4">
       <div className="flex max-w-4xl w-full rounded-lg shadow-md overflow-hidden" style={{ borderRadius: "0.75rem" }}>
@@ -105,7 +106,8 @@ const Login: React.FC = () => {
             </button>
             <span className="text-xs">
               Don’t have an account?{" "}
-              <span className="text-blue-500 cursor-pointer">Sign up now.</span>
+              <span onClick={handleSignUp} className="text-blue-500 cursor-pointer">Sign up now.</span>
+
             </span>
           </div>
         </form>
