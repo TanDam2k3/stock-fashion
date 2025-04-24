@@ -8,7 +8,7 @@ const create = async (payload) => {
       mimeType: payload?.mimetype,
       size: payload?.size,
       path: payload?.path,
-      fileUrl: `/uploads/${payload?.filename}`
+      fileUrl: `/images/${payload?.filename}`
     };
 
     const file = await fileModel.create(data);
@@ -19,6 +19,17 @@ const create = async (payload) => {
   }
 };
 
+const getList = async (query) => {
+  try {
+    const file = await fileModel.find(query).lean();
+    return file;
+  } catch(e) {
+    await httpErrorService.create(e, 'Get list file Service');
+    return null;
+  }
+}
+
 module.exports = {
-  create
+  create,
+  getList
 };

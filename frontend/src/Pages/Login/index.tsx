@@ -1,42 +1,55 @@
+import axios from "axios";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { SubmitHandler, useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import CryptoJS from 'crypto-js';
+import Cookies from 'js-cookie';
+import SuccessPopup from '../../components/popup/SuccessPopup';
+
+type Inputs = {
+  username: string;
+  password: string;
+}
 
 const Login: React.FC = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
-  const navigate = useNavigate(); // Khai báo useNavigate
+  const [showPopup, setShowPopup] = useState(false);
+  const navigate = useNavigate();
+  const API_END_POINT = import.meta.env.VITE_API_URL;
+  const ENCRYPT_KEY = import.meta.env.VITE_ENCRYPT_KEY;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+  } = useForm<Inputs>();
+
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      // Giả lập gọi API
-      const fakeLoginApi = (username: string, password: string) =>
-        new Promise<{ success: boolean }>((resolve) => {
-          setTimeout(() => {
-            if (username === "admin" && password === "adminadmin") {
-              resolve({ success: true });
-            } else {
-              resolve({ success: false });
-            }
-          }, 1000); // Giả lập độ trễ 1s
+      const encrypted = CryptoJS.AES.encrypt(data?.password, ENCRYPT_KEY).toString();
+
+      const payload = {
+        username: data.username,
+        password: encrypted,
+      };
+
+      const response = await axios.post(`${API_END_POINT}/api/auth/login`, payload);
+      const token = response?.data?.token;
+      if (token) {
+        Cookies.set('token', token, {
+          expires: remember ? 7 : undefined,
+          sameSite: 'Strict'
         });
-  
-      const result = await fakeLoginApi(username, password);
-  
-      if (result.success) {
-        navigate("/app"); // Điều hướng nếu thành công
+
+        setShowPopup(true);
       } else {
-        alert("Tên đăng nhập hoặc mật khẩu không chính xác.");
+        alert('Đăng nhập thất bại. Không nhận được token.');
       }
-    } catch (error) {
-      alert("Đã xảy ra lỗi khi đăng nhập.");
+    } catch (e) {
+      console.log(e);
+      alert('Có lỗi xảy ra. Vui lòng thử lại.');
     }
   };
-  
-  const handleSignUp = () => {
-    navigate("/register");
-  };
+
   return (
     <div className="bg-white min-h-screen flex items-center justify-center p-4">
       <div className="flex max-w-4xl w-full rounded-lg shadow-md overflow-hidden" style={{ borderRadius: "0.75rem" }}>
@@ -49,7 +62,7 @@ const Login: React.FC = () => {
         />
         <form
           autoComplete="off"
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmit(onSubmit)}
           className="w-1/2 bg-white px-6 py-10 rounded-r-lg shadow-md flex items-center justify-center"
           style={{ borderTopRightRadius: "0.75rem", borderBottomRightRadius: "0.75rem" }}
         >
@@ -68,8 +81,7 @@ const Login: React.FC = () => {
               id="username"
               type="text"
               className="w-full border-0 border-b border-b-gray-400 focus:ring-0 px-2 py-2 text-sm mb-4"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              {...register("username")}
             />
 
             <label htmlFor="password" className="block font-normal text-black mb-1">
@@ -79,8 +91,7 @@ const Login: React.FC = () => {
               id="password"
               type="password"
               className="w-full border-0 border-b border-b-gray-400 focus:border-b-blue-700 focus:ring-0 px-2 py-2 text-sm mb-4"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              {...register("password")}
             />
 
             <div className="flex items-center justify-between text-xs mb-4 text-gray-600">
@@ -106,12 +117,18 @@ const Login: React.FC = () => {
             </button>
             <span className="text-xs">
               Don’t have an account?{" "}
-              <span onClick={handleSignUp} className="text-blue-500 cursor-pointer">Sign up now.</span>
-
+              <span onClick={() => navigate("/register")} className="text-blue-500 cursor-pointer">Sign up now.</span>
             </span>
           </div>
         </form>
       </div>
+
+      <SuccessPopup
+        message="Đăng nhập thành công!"
+        isOpen={showPopup}
+        onClose={() => setShowPopup(false)}
+        redirectPath="/"
+      />
     </div>
   );
 };

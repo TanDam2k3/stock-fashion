@@ -21,7 +21,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/stocks', stockTransactionRoutes);
 app.use('/api/houseware', housewareRoutes);
 app.use('/api/files', fileRoutes);
-app.use('/api/files', express.static(path.join(__dirname, '../public/images')));
+app.use(express.static('public'));
 
 app.use(errorHandler);
 

@@ -3,8 +3,8 @@ const httpErrorService = require('../services/httpErrorService');
 
 exports.deleted = async (req, res) => {
   try {
-    const {role} = req?.user;
-    if(!role || role !== 'admin') res.status(404).json({message: 'Forbidden'});
+    const { role } = req?.user;
+    if (!role || role !== 'admin') res.status(404).json({ message: 'Forbidden' });
     if (!req?.body) res.status(400).json({ message: 'Error deleted' });
     const deleted = await adminService.create(req.body);
 

@@ -14,6 +14,7 @@ const register = async (username, password, email) => {
       }),
       decryptPassword(password)
     ]);
+
     if (existing) return false;
 
     const hashed = await hashPassword(rawPassword);

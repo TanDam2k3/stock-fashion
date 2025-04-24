@@ -1,44 +1,55 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import VerifyPopup from "../../components/register/VerifyPopup";
+import { useForm, SubmitHandler } from "react-hook-form";
+import axios from 'axios';
+import CryptoJS from 'crypto-js';
+import SuccessPopup from '../../components/popup/SuccessPopup';
+
+type Inputs = {
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
 
 const Register: React.FC = () => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState(""); // ✅ Thêm email
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showVerify, setShowVerify] = useState(false); // ✅ Hiển thị popup
   const navigate = useNavigate();
+  const API_END_POINT = import.meta.env.VITE_API_URL;
+  const ENCRYPT_KEY = import.meta.env.VITE_ENCRYPT_KEY;
+  const [showPopup, setShowPopup] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+  } = useForm<Inputs>();
 
-    if (password !== confirmPassword) {
-      alert("Mật khẩu xác nhận không khớp.");
-      return;
-    }
-
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      const fakeRegisterApi = (username: string, password: string, email: string) =>
-        new Promise<{ success: boolean }>((resolve) => {
-          setTimeout(() => {
-            if (username && password && email) {
-              resolve({ success: true });
-            } else {
-              resolve({ success: false });
-            }
-          }, 1000);
-        });
-
-      const result = await fakeRegisterApi(username, password, email);
-
-      if (result.success) {
-        setShowVerify(true); // ✅ Hiển thị popup
-      } else {
-        alert("Đăng ký thất bại. Vui lòng thử lại.");
+      const comparePassword = data?.confirmPassword === data?.password;
+      if (!comparePassword) {
+        alert('Mật khẩu không khớp');
+        return;
       }
-    } catch (error) {
-      alert("Đã xảy ra lỗi khi đăng ký.");
+
+      const encrypted = CryptoJS.AES.encrypt(data?.password, ENCRYPT_KEY).toString();
+
+      const payload = {
+        username: data.username,
+        password: encrypted,
+        email: data.email
+      };
+
+      const response = await axios.post(`${API_END_POINT}/api/auth/register`, payload);
+      console.log('register', response);
+
+      if (response.data === true) {
+        setShowPopup(true);
+      } else {
+        alert('Đăng ký thất bại. Vui lòng thử lại.');
+      }
+    } catch (e) {
+      console.log(e);
+      alert('Có lỗi xảy ra. Vui lòng thử lại.');
     }
   };
 
@@ -52,7 +63,7 @@ const Register: React.FC = () => {
         />
         <form
           autoComplete="off"
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmit(onSubmit)}
           className="w-1/2 bg-white px-6 py-10 rounded-r-lg shadow-md flex items-center justify-center"
         >
           <div className="w-full">
@@ -67,8 +78,7 @@ const Register: React.FC = () => {
               id="username"
               type="text"
               className="w-full border-b border-b-gray-400 px-2 py-2 text-sm mb-4"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              {...register("username")}
             />
 
             <label htmlFor="email" className="block mb-1">
@@ -78,10 +88,8 @@ const Register: React.FC = () => {
               id="email"
               type="email"
               className="w-full border-b border-b-gray-400 px-2 py-2 text-sm mb-4"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              {...register("email")}
             />
-
             <label htmlFor="password" className="block mb-1">
               Mật khẩu
             </label>
@@ -89,8 +97,7 @@ const Register: React.FC = () => {
               id="password"
               type="password"
               className="w-full border-b border-b-gray-400 px-2 py-2 text-sm mb-4"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              {...register("password")}
             />
 
             <label htmlFor="confirmPassword" className="block mb-1">
@@ -100,8 +107,7 @@ const Register: React.FC = () => {
               id="confirmPassword"
               type="password"
               className="w-full border-b border-b-gray-400 px-2 py-2 text-sm mb-4"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              {...register("confirmPassword")}
             />
 
             <button
@@ -115,7 +121,7 @@ const Register: React.FC = () => {
               Đã có tài khoản?{" "}
               <span
                 className="text-blue-500 cursor-pointer"
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/login")}
               >
                 Đăng nhập
               </span>
@@ -123,9 +129,12 @@ const Register: React.FC = () => {
           </div>
         </form>
       </div>
-
-      {/* ✅ Hiển thị popup xác minh */}
-      {showVerify && <VerifyPopup email={email} onClose={() => setShowVerify(false)} />}
+      <SuccessPopup
+        message="Đăng ký thành công!"
+        isOpen={showPopup}
+        onClose={() => setShowPopup(false)}
+        redirectPath="/login"
+      />
     </div>
   );
 };

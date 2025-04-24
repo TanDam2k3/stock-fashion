@@ -7,9 +7,9 @@ exports.register = async (req, res) => {
     if (!username || !password || !email) res.status(400).json({ message: 'Please fill out the registration form completely.' });
     const auth = await authService.register(username, password, email);
     if (auth) {
-      res.status(201).json({ message: 'User created' });
+      res.status(201).json(true);
     } else {
-      res.status(400).json({ message: 'Username or email already exists' });
+      res.status(400).json(false);
     }
   } catch (e) {
     await httpErrorService.create(e, 'Register');
