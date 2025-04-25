@@ -11,6 +11,9 @@ const housewareSchema = new mongoose.Schema(
     },
     address: {
       type: String
+    },
+    city: {
+      type: String
     }
   },
   {
