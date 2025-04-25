@@ -4,7 +4,7 @@
   "main": "src/server.js",
   "scripts": {
     "build": "babel src --out-dir dist --copy-files",
-    "start": "node dist/server.js",
+    "start": "nodemon src/server.js",
     "dev": "nodemon src/server.js",
     "lint": "npx eslint --fix ."
   },
