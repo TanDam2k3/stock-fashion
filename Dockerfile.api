@@ -1,26 +1,26 @@
-# Use official Node.js 18 image as base
+# Use official Node.js image (sử dụng LTS ổn định hơn như 18 hoặc 20 thay vì 23 có thể tốt hơn)
 FROM node:23
 
 # Set the working directory inside the container
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json first (for caching)
+# Copy package.json and package-lock.json (hoặc yarn.lock)
 COPY package*.json ./
 
-# Install system dependencies for bcrypt, sharp, and other native modules
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    python3 \
-    libvips-dev \
-    && rm -rf /var/lib/apt/lists/*
+# Install system dependencies (chỉ cần nếu các package Node yêu cầu)
+# Alpine dùng apk thay vì apt-get
+RUN apk add --no-cache python3 make g++
 
-# Install Node.js dependencies
+# Install Node.js dependencies (chỉ cài production dependencies nếu bạn build trước)
+# Hoặc cài tất cả nếu bạn build bên trong container như hiện tại
 RUN npm install
 
-# Copy the rest of the application
+# Copy the rest of the application code
+# Quan trọng: Copy code SAU KHI đã npm install để tận dụng cache tốt hơn
 COPY . .
 
 # Build the application with Babel
+# Lệnh này sẽ chạy script "build" trong package.json đã được copy ở bước trên
 RUN npm run build
 
 # Expose port 5000 for API
