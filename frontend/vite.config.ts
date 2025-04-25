@@ -17,8 +17,5 @@ export default defineConfig({
     strictPort: true,
     allowedHosts: true,
     port: 5001,
-  },
-  define: {
-    __APP_API_URL__: "http://localhost:5000",
-  },
+  }
 })
