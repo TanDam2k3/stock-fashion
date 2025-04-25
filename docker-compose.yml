@@ -25,7 +25,7 @@ services:
     cpus: 1
     restart: always
     env_file:
-      - .env
+      - api/.env
 
   user:
     build:
@@ -38,7 +38,7 @@ services:
     depends_on:
       - mongo
     env_file:
-      - .env
+      - frontend/.env
     restart: always
 
 networks:
