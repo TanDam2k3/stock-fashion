@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import AddStockForm from "../../components/add-stock/add-stock-form";
-import AddStockTable from "../../components/add-stock/add-stock-table";
-import AddStockActions from "../../components/add-stock/add-stock-actions";
+
 
 interface HousewareFormData {
   name: string;
@@ -44,36 +43,6 @@ const AddStock: React.FC = () => {
     setFormData({ name: "", address: "", city: "" });
   };
 
-  const handleEdit = (hw: Houseware) => {
-    setEditingId(hw.id);
-    setFormData({ name: hw.name, address: hw.address, city: hw.city });
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleDelete = (id: string) => {
-    setHousewares(housewares.filter(hw => hw.id !== id));
-    if (editingId === id) {
-      setEditingId(null);
-      setFormData({ name: "", address: "", city: "" });
-    }
-  };
-
-  const handleClearAll = () => {
-    setHousewares([]);
-    setEditingId(null);
-    setFormData({ name: "", address: "", city: "" });
-  };
-
-  const handleSaveAll = () => {
-    if (housewares.length === 0) return;
-    if (confirm("Save all to localStorage?")) {
-      const existing = JSON.parse(localStorage.getItem("savedHousewares") || "[]");
-      localStorage.setItem("savedHousewares", JSON.stringify([...existing, ...housewares]));
-      handleClearAll();
-      alert("Saved!");
-    }
-  };
-
   return (
     <div className="w-full rounded-md bg-white flex items-center flex-col gap-5 p-5">
       <div className="w-full rounded-md bg-white p-5">
@@ -89,17 +58,6 @@ const AddStock: React.FC = () => {
         />
       </div>
 
-      <div className="w-full rounded-md bg-white p-5">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-black text-xl font-semibold">Housewares List</h2>
-          <AddStockActions
-            onClearAll={handleClearAll}
-            onSaveAll={handleSaveAll}
-            disabled={housewares.length === 0}
-          />
-        </div>
-        <AddStockTable housewares={housewares} onEdit={handleEdit} onDelete={handleDelete} />
-      </div>
     </div>
   );
 };

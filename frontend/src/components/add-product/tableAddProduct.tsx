@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { createProduct } from "../../api/api-product";
+import { toast } from "react-toastify";
 
 interface Product {
   id: string;
@@ -10,12 +12,21 @@ interface Product {
   price: number;
   imagePreview?: string;
 }
-
+interface Stock {
+  _id: string; 
+  name: string;
+  city: string;
+  address: string;
+  createdAt: string;
+  updatedAt: string;
+  status: string; 
+}
 interface ProductsTableProps {
   products: Product[];
   onUpdateProduct: (updatedProduct: Product) => void;
   onDeleteProduct: (productId: string) => void;
-  onClearAll: () => void; // New prop for clearing all products
+  onClearAll: () => void;
+  housewareOptions: Stock[]; 
 }
 
 const ProductsTable: React.FC<ProductsTableProps> = ({ 
@@ -38,25 +49,38 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
     }
   };
 
-  const handleSaveAllToLocalStorage = () => {
+  const handleCreateAllProducts = async () => {
     if (products.length === 0) {
-      alert("No products to save!");
+      alert("No products to create!");
       return;
     }
-
-    if (window.confirm("Are you sure you want to save all products to localStorage and clear the table?")) {
-      // Save to localStorage
-      const existingProducts = JSON.parse(localStorage.getItem('savedProducts') || '[]');
-      const updatedProducts = [...existingProducts, ...products];
-      localStorage.setItem('savedProducts', JSON.stringify(updatedProducts));
-      
-      // Clear the table
-      onClearAll();
-      
-      alert(`Saved ${products.length} products to localStorage!`);
+  
+    if (window.confirm("Are you sure you want to create all products to DB and clear the table?")) {
+      let successCount = 0;
+  
+      for (const product of products) {
+        try {
+          await createProduct({
+            housewareId: product.id,
+            name: product.name,
+            type: product.type,
+            quantity: product.quantity,
+            status: 'active',
+            fileId:'',
+            price: product.price,
+          });
+          successCount++;
+          toast.success('create successfully')
+        } catch (error) {
+          console.error(`❌ Failed to create product "${product.name}":`, error);
+        }
+      }
+  
+      alert(`✅ Created ${successCount} / ${products.length} products to DB.`);
+      onClearAll(); // clear table
     }
   };
-
+  
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setCurrentProduct(prev => ({
@@ -77,12 +101,17 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
     <div className="w-full rounded-md bg-white p-5">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-black text-xl font-semibold">Products List</h2>
-        <button
-          onClick={handleSaveAllToLocalStorage}
-          className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-sm"
-        >
-          Save All to LocalStorage
-        </button>
+        <div className="flex justify-between items-center mb-6">
+  <div className="flex gap-3">
+    <button
+      onClick={handleCreateAllProducts}
+      className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md text-sm"
+    >
+      Create All to DB
+    </button>
+  </div>
+</div>
+
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200">
@@ -91,7 +120,9 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Houseware ID</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Houseware Name</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Houseware_ID</th>
+
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
@@ -114,6 +145,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{product.name}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.housewareId}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.id}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.type}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.quantity}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.price.toFixed(2)}</td>

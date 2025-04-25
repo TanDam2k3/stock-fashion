@@ -100,7 +100,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 
       <nav className="mt-2">
         <ul>
-        {menuItem(<FaHome />, "Tổng quan", "/app")}
+        {menuItem(<FaHome />, "Tổng quan", "/")}
         {menuItem(<IoIosAddCircle />, "Thêm", undefined, () =>
   toggleDropdown("add"), true, "add"
 )}

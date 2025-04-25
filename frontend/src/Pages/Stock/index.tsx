@@ -1,50 +1,126 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import StockFilter from '../../components/stock/filter';
 import StockTable from '../../components/stock/table';
+import { deleteStock, fetchStockList, updateStock } from '../../api/api-stock';
+import ConfirmDeletePopup from '../../components/stock/confirm-deleted-popup';
+import EditStockPopup from '../../components/stock/edit-popup';
+
+interface Stock {
+  _id: string;
+  name: string;
+  city: string;
+  address: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 const StockList: React.FC = () => {
   const [filters, setFilters] = useState({
     name: '',
-    city: ''
+    city: '',
+    createdAt: ''
   });
 
-  const [stocks] = useState([
-    {
-      id: '1',
-      name: 'Kho Hà Nội',
-      city: 'Hà Nội',
-      address: '123 Lê Duẩn',
-      createdAt: '2024-04-01',
-      updatedAt: '2025-04-01'
-    },
-    {
-      id: '2',
-      name: 'Kho Sài Gòn',
-      city: 'Hồ Chí Minh',
-      address: '456 Nguyễn Huệ',
-      createdAt: '2023-10-10',
-      updatedAt: '2025-03-22'
-    }
-  ]);
-
+  const [stocks, setStocks] = useState<Stock[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+  const [stockToDelete, setStockToDelete] = useState<string | null>(null);
+
+  const [showEditPopup, setShowEditPopup] = useState(false);
+  const [stockToEdit, setStockToEdit] = useState<Stock | null>(null);
+  const [formData, setFormData] = useState({ name: '', address: '', city: '' });
+
   const itemsPerPage = 10;
 
+  const fetchStocks = async () => {
+    try {
+      const stockList = await fetchStockList();
+      setStocks(stockList);
+    } catch (error) {
+      console.error('Error fetching stock list:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchStocks();
+  }, []);
+
+  // DELETE
+  const handleDeleteClick = (id: string) => {
+    setStockToDelete(id);
+    setShowConfirmPopup(true);
+  };
+
+  const handleDelete = async () => {
+    if (!stockToDelete) return;
+
+    const response = await deleteStock(stockToDelete);
+    if (response) {
+      toast.success("Deleted successfully!");
+      fetchStocks();
+    } else {
+      toast.warning("Delete failed!");
+    }
+    setShowConfirmPopup(false);
+  };
+
+  const handleCancelDelete = () => {
+    setShowConfirmPopup(false);
+  };
+
+  // EDIT
+  const handleEditClick = (stock: Stock) => {
+    setStockToEdit(stock);
+    setFormData({
+      name: stock.name,
+      address: stock.address,
+      city: stock.city,
+    });
+    setShowEditPopup(true);
+  };
+
+  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+  
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!stockToEdit) return;
+
+    const updatedStock = {
+      _id: stockToEdit._id,
+      ...formData,
+    };
+
+    const response = await updateStock(updatedStock);
+    if (response?.message?.includes('success')) {
+      toast.success("updated successfully!!");
+      fetchStocks();
+    } else {
+      toast.warning("update failed");
+    }
+
+    setShowEditPopup(false);
+  };
+
+  // FILTER
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFilters(prev => ({ ...prev, [name]: value }));
+    setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Filters:', filters);
-    // Ở đây bạn có thể gọi API filter
   };
 
-  // Filter tạm (demo)
-  const filteredStocks = stocks.filter(stock =>
+  // PAGINATION + FILTER
+  const filteredStocks = stocks.filter((stock) =>
     stock.name.toLowerCase().includes(filters.name.toLowerCase()) &&
-    (filters.city ? stock.city === filters.city : true)
+    (filters.city ? stock.city === filters.city : true) &&
+    (filters.createdAt ? stock.createdAt.startsWith(filters.createdAt) : true)
   );
 
   const totalPages = Math.ceil(filteredStocks.length / itemsPerPage);
@@ -61,9 +137,32 @@ const StockList: React.FC = () => {
             DANH SÁCH KHO HÀNG
           </div>
           <StockFilter filters={filters} onChange={handleFilterChange} onSubmit={handleSubmit} />
-          <StockTable stocks={paginatedStocks} currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+          <StockTable
+            stocks={paginatedStocks}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            onDelete={handleDeleteClick}
+            onEdit={handleEditClick}
+          />
         </div>
       </div>
+
+      {showConfirmPopup && (
+        <ConfirmDeletePopup
+          onConfirm={handleDelete}
+          onCancel={handleCancelDelete}
+        />
+      )}
+
+      {showEditPopup && (
+        <EditStockPopup
+          formData={formData}
+          onChange={handleEditChange}
+          onSubmit={handleEditSubmit}
+          onCancel={() => setShowEditPopup(false)}
+        />
+      )}
     </div>
   );
 };

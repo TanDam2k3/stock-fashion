@@ -2,6 +2,8 @@ import axios from "axios";
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { API_END_POINT, TOKEN } from "../../config";
+import { createStock } from "../../api/api-stock";
+import { toast } from "react-toastify";
 
 interface HousewareFormData {
   name: string;
@@ -29,37 +31,23 @@ const AddStockForm: React.FC<Props> = ({ editingId, onCancel }) => {
     } = useForm<Inputs>();
 
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
-      try { 
-        if (!data.name || !data.city || !data.address){
-          alert("chua dien du thong tin")
-          return;
+      if (!data.name || !data.city || !data.address) {
+        alert("Chưa điền đủ thông tin");
+        return;
+      }
+  
+      try {
+        const result = await createStock(data);
+        if (result) {
+         toast.success('Created successfully!')
+        } else {
+          toast.warning('Created failed!')
         }
-        const payload = {
-          name: data.name,
-          city: data.city ,
-          address: data.address ,
-
-        };
-        const response = await axios.post(
-          `${API_END_POINT}/api/houseware/create`,
-           payload,
-           {
-            headers: {
-              Authorization: `Bearer ${TOKEN}`
-            }
-          }
-        );
-        if (response.data) {
-          alert("Thêm thanh công")
-        }
-        else {
-          alert("Thêm that bai")
-        }
-      } catch (e) {
-        console.log(e);
-        alert('Có lỗi xảy ra. Vui lòng thử lại.');
+      } catch (error) {
+        error
       }
     };
+  
   return (
     <form className="w-full" onSubmit={handleSubmit(onSubmit)} autoComplete="off" noValidate>
       <h2 className="text-black text-xl font-semibold mb-6">

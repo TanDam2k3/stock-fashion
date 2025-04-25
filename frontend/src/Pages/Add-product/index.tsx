@@ -1,5 +1,6 @@
-import React, { useState, ChangeEvent, FormEvent } from "react";
-import ProductsTable from "../../components/add-product/table/tableAddProduct";
+import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
+import ProductsTable from "../../components/add-product/tableAddProduct";
+import { fetchStockList } from "../../api/api-stock";
 
 interface ProductFormData {
   housewareId: string;
@@ -10,20 +11,36 @@ interface ProductFormData {
   price: number;
   productImage: File | null;
 }
-
+interface Stock {
+  _id: string; 
+  name: string;
+  city: string;
+  address: string;
+  createdAt: string;
+  updatedAt: string;
+  status: string; 
+}
 interface Product extends Omit<ProductFormData, 'productImage'> {
   id: string;
   imagePreview?: string;
 }
 
 const AddProduct: React.FC = () => {
-  const housewareOptions = [
-    { value: "HW001", label: "HW001 - Phòng khách" },
-    { value: "HW002", label: "HW002 - Phòng ngủ" },
-    { value: "HW003", label: "HW003 - Nhà bếp" },
-    { value: "HW004", label: "HW004 - Phòng tắm" },
-    { value: "HW005", label: "HW005 - Văn phòng" },
-  ];
+  const [housewareOptions, setHousewareOptions] = useState<Stock[]>([]);
+
+  useEffect(() => {
+    const loadHousewareOptions = async () => {
+      try {
+        const activeHousewares = await fetchStockList();
+        setHousewareOptions(activeHousewares);
+      } catch (error) {
+        console.error("Failed to fetch houseware options:", error);
+      }
+    };
+  
+    loadHousewareOptions();
+  }, []);
+  
 
   const [formData, setFormData] = useState<ProductFormData>({
     housewareId: "",
@@ -150,37 +167,6 @@ const AddProduct: React.FC = () => {
     }
   };
 
-  // const handleSaveAllToLocalStorage = () => {
-  //   if (products.length === 0) {
-  //     alert("No products to save!");
-  //     return;
-  //   }
-
-  //   if (window.confirm(`Are you sure you want to save all ${products.length} products to localStorage and clear the table?`)) {
-  //     try {
-  //       // Get existing products from localStorage or initialize empty array
-  //       const existingProducts = JSON.parse(localStorage.getItem('savedProducts') || '[]');
-        
-  //       // Create new array with existing and current products
-  //       const updatedProducts = [...existingProducts, ...products.map(product => {
-  //         // Remove the imagePreview as it's a blob URL that won't persist
-  //         const { imagePreview, ...productWithoutPreview } = product;
-  //         return productWithoutPreview;
-  //       })];
-        
-  //       // Save to localStorage
-  //       localStorage.setItem('savedProducts', JSON.stringify(updatedProducts));
-        
-  //       // Clear the table
-  //       handleClearAllProducts();
-        
-  //       alert(`Successfully saved ${products.length} products to localStorage!`);
-  //     } catch (error) {
-  //       console.error("Error saving to localStorage:", error);
-  //       alert("Failed to save products to localStorage. Please try again.");
-  //     }
-  //   }
-  // };
 
   return (
     <div className="w-full rounded-md bg-white flex items-center flex-col gap-5 p-5"> 
@@ -215,14 +201,13 @@ const AddProduct: React.FC = () => {
                   Select houseware ID
                 </option>
                 {housewareOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
+                  <option key={option._id} value={option.name}>
+                    {option.name}
                   </option>
                 ))}
               </select>
             </div>
-            
-            {/* Name */}
+
             <div>
               <label
                 htmlFor="name"
@@ -261,9 +246,9 @@ const AddProduct: React.FC = () => {
                 <option value="" disabled>
                   Select type
                 </option>
-                <option>Type 1</option>
-                <option>Type 2</option>
-                <option>Type 3</option>
+                <option>Áo</option>
+                <option>Áo khoác</option>
+                <option>Quần</option>
               </select>
             </div>
             
@@ -400,6 +385,7 @@ const AddProduct: React.FC = () => {
         onUpdateProduct={handleUpdateProduct}
         onDeleteProduct={handleDeleteProduct}
         onClearAll={handleClearAllProducts}
+        housewareOptions={housewareOptions} // 👈 thêm dòng này
       />
     </div>
   );

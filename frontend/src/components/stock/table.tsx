@@ -2,7 +2,7 @@ import React from 'react';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 
 interface Stock {
-  id: string;
+  _id: string;
   name: string;
   city: string;
   address: string;
@@ -15,9 +15,18 @@ interface TableProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  onDelete: (id: string) => void;
+  onEdit: (stock: Stock) => void; // ✅ thêm prop onEdit
 }
 
-const StockTable: React.FC<TableProps> = ({ stocks, currentPage, totalPages, onPageChange }) => {
+const StockTable: React.FC<TableProps> = ({
+  stocks,
+  currentPage,
+  totalPages,
+  onPageChange,
+  onDelete,
+  onEdit, // ✅ destructure thêm onEdit
+}) => {
   return (
     <>
       <div className="overflow-x-auto scrollbar-thin">
@@ -33,28 +42,42 @@ const StockTable: React.FC<TableProps> = ({ stocks, currentPage, totalPages, onP
             </tr>
           </thead>
           <tbody>
-            {stocks.map((stock, index) => (
-              <tr
-                key={stock.id}
-                className={`${
-                  index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-                } border border-gray-200 rounded-md`}
-              >
-                <td className="px-4 py-2">{stock.name}</td>
-                <td className="px-4 py-2">{stock.city}</td>
-                <td className="px-4 py-2">{stock.address}</td>
-                <td className="px-4 py-2">{stock.createdAt}</td>
-                <td className="px-4 py-2">{stock.updatedAt}</td>
-                <td className="px-4 py-2 space-x-3">
-                  <button onClick={() => console.log('Edit', stock.id)} className="text-green-500 hover:scale-125">
-                    <FaEdit size={18} />
-                  </button>
-                  <button onClick={() => console.log('Delete', stock.id)} className="text-red-500 hover:scale-125">
-                    <FaTrashAlt size={18} />
-                  </button>
+            {stocks.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="text-center text-gray-500 py-6">
+                  Không có dữ liệu kho hàng.
                 </td>
               </tr>
-            ))}
+            ) : (
+              stocks.map((stock, index) => (
+                <tr
+                  key={stock._id}
+                  className={`${
+                    index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                  } border border-gray-200 rounded-md`}
+                >
+                  <td className="px-4 py-2">{stock.name}</td>
+                  <td className="px-4 py-2">{stock.city}</td>
+                  <td className="px-4 py-2">{stock.address}</td>
+                  <td className="px-4 py-2">{stock.createdAt}</td>
+                  <td className="px-4 py-2">{stock.updatedAt}</td>
+                  <td className="px-4 py-2 space-x-3">
+                    <button
+                      onClick={() => onEdit(stock)} // ✅ Gọi callback onEdit
+                      className="text-green-500 hover:scale-125"
+                    >
+                      <FaEdit size={18} />
+                    </button>
+                    <button
+                      onClick={() => onDelete(stock._id)}
+                      className="text-red-500 hover:scale-125"
+                    >
+                      <FaTrashAlt size={18} />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
