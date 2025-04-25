@@ -22,7 +22,7 @@ type Inputs = {
   city: string
 }
 
-const AddStockForm: React.FC<Props> = ({ formData, editingId, onChange, onCancel }) => {
+const AddStockForm: React.FC<Props> = ({ editingId, onCancel }) => {
     const {
       register,
       handleSubmit,
