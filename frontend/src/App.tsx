@@ -8,8 +8,9 @@ import Contact from "./Pages/Contact/Contact";
 import Home from "./Pages/Home";
 import AddProduct from "./Pages/Add-product";
 import AddStock from "./Pages/Add-stock";
-import ProductList from "./Pages/Stock";
+import ProductList from "./Pages/ProductList";
 import ProtectedRoute from "./utils/auth/ProtectedRoute";
+import StockList from "./Pages/Stock";
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
             <Route path="add-product" element={<AddProduct />} />
             <Route path="add-stock" element={<AddStock />} />
             <Route path="products" element={<ProductList />} />
+            <Route path="stocks" element={<StockList />} />
             <Route path="contact" element={<Contact />} />
           </Route>
         </Route>

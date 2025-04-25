@@ -4,6 +4,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import SuccessPopup from '../../components/popup/SuccessPopup';
+import { API_END_POINT, ENCRYPT_KEY } from "../../config";
 
 type Inputs = {
   username: string;
@@ -14,8 +15,6 @@ type Inputs = {
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
-  const API_END_POINT = import.meta.env.VITE_API_URL;
-  const ENCRYPT_KEY = import.meta.env.VITE_ENCRYPT_KEY;
   const [showPopup, setShowPopup] = useState(false);
 
   const {
