@@ -1,5 +1,5 @@
 # Build stage
-FROM node:23 as builder
+FROM node:20-alpine
 WORKDIR /usr/src/app
 
 # Copy package.json -> cài dependencies

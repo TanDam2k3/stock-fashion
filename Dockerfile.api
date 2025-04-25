@@ -1,5 +1,5 @@
 # Use official Node.js image (sử dụng LTS ổn định hơn như 18 hoặc 20 thay vì 23 có thể tốt hơn)
-FROM node:23
+FROM node:20-alpine
 
 # Set the working directory inside the container
 WORKDIR /usr/src/app
