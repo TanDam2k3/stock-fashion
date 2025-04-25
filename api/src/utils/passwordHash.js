@@ -1,14 +1,16 @@
 const bcrypt = require('bcrypt');
 const CryptoJS = require('crypto-js');
 
-const generateSalt = (byteSize = 16) => crypto.randomBytes(byteSize).toString('base64');
-
 const hashPassword = async (password) => {
   const salt = await bcrypt.genSalt(10);
-  return await bcrypt.hash(password, salt);
+  const hash = await bcrypt.hash(password, salt);
+  return hash;
 };
 
-const comparePassword = async (password, hashed) => await bcrypt.compare(password, hashed);
+const comparePassword = async (password, hashed) => {
+  const result = await bcrypt.compare(password, hashed);
+  return result;
+};
 
 const decryptPassword = (encryptedPassword) => {
   const bytes = CryptoJS.AES.decrypt(encryptedPassword, process.env.ENCRYPT_KEY);

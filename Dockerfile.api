@@ -1,22 +1,30 @@
-# Use official Node.js image as base image
-FROM node:18-alpine
+# Use official Node.js 18 image as base
+FROM node:18
 
 # Set the working directory inside the container
 WORKDIR /usr/src/app
 
 # Copy package.json and package-lock.json first (for caching)
-COPY api/package*.json ./
+COPY package*.json ./
+
+# Install system dependencies for bcrypt, sharp, and other native modules
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    python3 \
+    libvips-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js dependencies
 RUN npm install
 
 # Copy the rest of the application
-COPY api/ ./
-WORKDIR /usr/src/app/api
+COPY . .
 
-# Build ứng dụng
+# Build the application with Babel
 RUN npm run build
 
 # Expose port 5000 for API
 EXPOSE 5000
 
-# Start the API server
-CMD ["npm", "run", "start"]
+# Start the API server from the dist folder
+CMD ["node", "dist/server.js"]

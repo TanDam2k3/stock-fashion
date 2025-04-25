@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   mongo:
-    image: mongo:7.0
+    image: mongo:latest
     volumes:
       - mongo-data:/data/db
     networks:
@@ -21,7 +21,10 @@ services:
     depends_on:
       - mongo
     environment:
+      - NODE_ENV=production
       - MONGO_URI=mongodb://mongo:27017/fashionstock
+    mem_limit: 1g
+    cpus: 1
     restart: always
 
   user:

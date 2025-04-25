@@ -28,6 +28,7 @@ const register = async (username, password, email) => {
     return !!user;
   } catch (e) {
     await httpErrorService.create({ error: e, localtion: 'Register Service' });
+    return e;
   }
 };
 
@@ -44,6 +45,7 @@ const login = async (username, password) => {
     return token;
   } catch (e) {
     await httpErrorService.create({ error: e, localtion: 'Login Service' });
+    return e;
   }
 };
 
