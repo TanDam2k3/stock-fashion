@@ -1,30 +1,19 @@
-# Use official Node.js image (sử dụng LTS ổn định hơn như 18 hoặc 20 thay vì 23 có thể tốt hơn)
-FROM node:20-alpine
+# Use official Node.js image as base image
+FROM node:18-alpine
 
 # Set the working directory inside the container
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json (hoặc yarn.lock)
-COPY package*.json ./
-
-# Install system dependencies (chỉ cần nếu các package Node yêu cầu)
-# Alpine dùng apk thay vì apt-get
-RUN apk add --no-cache python3 make g++
-
-# Install Node.js dependencies (chỉ cài production dependencies nếu bạn build trước)
-# Hoặc cài tất cả nếu bạn build bên trong container như hiện tại
+# Copy package.json and package-lock.json first (for caching)
+COPY api/package*.json ./
 RUN npm install
 
-# Copy the rest of the application code
-# Quan trọng: Copy code SAU KHI đã npm install để tận dụng cache tốt hơn
-COPY . .
-
-# Build the application with Babel
-# Lệnh này sẽ chạy script "build" trong package.json đã được copy ở bước trên
-RUN npm run build
+# Copy the rest of the application
+COPY api/ ./
+WORKDIR /usr/src/app/api
 
 # Expose port 5000 for API
 EXPOSE 5000
 
-# Start the API server from the dist folder
-CMD ["node", "dist/server.js"]
+# Start the API server
+CMD ["npm", "run", "start"]
