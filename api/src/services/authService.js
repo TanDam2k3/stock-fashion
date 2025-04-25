@@ -42,8 +42,6 @@ const login = async (username, password) => {
     if (!user || !verifyPassword) return null;
 
     const token = generateToken(user);
-    console.log('process.env.JWT_SECRET', process.env.JWT_SECRET);
-    console.log('token', token);
     return token;
   } catch (e) {
     await httpErrorService.create({ error: e, localtion: 'Login Service' });

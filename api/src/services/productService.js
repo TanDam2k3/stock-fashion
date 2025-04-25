@@ -1,10 +1,10 @@
 const productModel = require('../models/Product');
 const httpErrorService = require('./httpErrorService');
-const fileService = require('../services/fileService');
+const fileService = require('./fileService');
 
 const create = async (payload) => {
   try {
-    if(!payload) return null;
+    if (!payload) return null;
     const data = {
       housewareId: payload?.housewareId || null,
       name: payload?.name || null,
@@ -25,18 +25,16 @@ const create = async (payload) => {
 const getList = async (query) => {
   try {
     const data = await productModel.find(query).lean();
-    if(!data?.length) return [];
+    if (!data?.length) return [];
 
-    const fileIds = data.map(d=> d?.fileId);
-    const files = await fileService.getList({_id: {$in: fileIds}});
+    const fileIds = data.map((d) => d?.fileId);
+    const files = await fileService.getList({ _id: { $in: fileIds } });
 
-    const filesMap = new Map(files.map(f=> [`${f._id}`, f.fileUrl])) || new Map();
-    const dataRespont = data.map(d=> {
-      return {
-        ...d,
-        imageUrl: `${process.env.DOMAIN}/${filesMap.get(d.fileId)}`
-      }
-    });
+    const filesMap = new Map(files.map((f) => [`${f._id}`, f.fileUrl])) || new Map();
+    const dataRespont = data.map((d) => ({
+      ...d,
+      imageUrl: `${process.env.DOMAIN}/${filesMap.get(d.fileId)}`
+    }));
     return dataRespont;
   } catch (e) {
     await httpErrorService.create(e, 'Get list product Service');
