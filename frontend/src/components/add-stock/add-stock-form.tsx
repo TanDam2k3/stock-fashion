@@ -1,7 +1,7 @@
-import axios from "axios";
+// import axios from "axios";
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { API_END_POINT, TOKEN } from "../../config";
+// import { API_END_POINT, TOKEN } from "../../config";
 import { createStock } from "../../api/api-stock";
 import { toast } from "react-toastify";
 
@@ -25,29 +25,29 @@ type Inputs = {
 }
 
 const AddStockForm: React.FC<Props> = ({ editingId, onCancel }) => {
-    const {
-      register,
-      handleSubmit,
-    } = useForm<Inputs>();
+  const {
+    register,
+    handleSubmit,
+  } = useForm<Inputs>();
 
-    const onSubmit: SubmitHandler<Inputs> = async (data) => {
-      if (!data.name || !data.city || !data.address) {
-        alert("Chưa điền đủ thông tin");
-        return;
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    if (!data.name || !data.city || !data.address) {
+      alert("Chưa điền đủ thông tin");
+      return;
+    }
+
+    try {
+      const result = await createStock(data);
+      if (result) {
+        toast.success('Created successfully!')
+      } else {
+        toast.warning('Created failed!')
       }
-  
-      try {
-        const result = await createStock(data);
-        if (result) {
-         toast.success('Created successfully!')
-        } else {
-          toast.warning('Created failed!')
-        }
-      } catch (error) {
-        error
-      }
-    };
-  
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <form className="w-full" onSubmit={handleSubmit(onSubmit)} autoComplete="off" noValidate>
       <h2 className="text-black text-xl font-semibold mb-6">
