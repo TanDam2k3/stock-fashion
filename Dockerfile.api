@@ -12,6 +12,9 @@ RUN npm install
 COPY api/ ./
 WORKDIR /usr/src/app/api
 
+# Build ứng dụng
+RUN npm run build
+
 # Expose port 5000 for API
 EXPOSE 5000
 
