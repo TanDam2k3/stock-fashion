@@ -1,34 +1,29 @@
 import React, { useState } from 'react';
-import FilterForm from '../../components/stock/filter';
-import ProductTable from '../../components/stock/table-in-stock';
+import StockFilter from '../../components/stock/filter';
+import StockTable from '../../components/stock/table';
 
-const ProductList: React.FC = () => {
+const StockList: React.FC = () => {
   const [filters, setFilters] = useState({
-    maPhieu: '',
-    nguonNhan: '80',
-    tinhTrang: '',
-    tuNgay: '',
-    denNgay: ''
+    name: '',
+    city: ''
   });
 
-  const [products] = useState([
+  const [stocks] = useState([
     {
-      id: '#20462',
-      image: 'https://placehold.co/40x40?text=&bg=8B5CF6&fg=fff&font=roboto',
-      name: 'Matt Dickerson',
-      source: 'Việt Nam',
-      category: 'Áo thun',
-      gender: 'Nam',
-      price: '100.000$'
+      id: '1',
+      name: 'Kho Hà Nội',
+      city: 'Hà Nội',
+      address: '123 Lê Duẩn',
+      createdAt: '2024-04-01',
+      updatedAt: '2025-04-01'
     },
     {
-      id: '#18933',
-      image: 'https://placehold.co/40x40?text=&bg=3B82F6&fg=fff&font=roboto',
-      name: 'Wiktoria',
-      source: 'Việt Nam',
-      category: 'Áo thun',
-      gender: 'Nam',
-      price: '100.000$'
+      id: '2',
+      name: 'Kho Sài Gòn',
+      city: 'Hồ Chí Minh',
+      address: '456 Nguyễn Huệ',
+      createdAt: '2023-10-10',
+      updatedAt: '2025-03-22'
     }
   ]);
 
@@ -42,26 +37,35 @@ const ProductList: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Filters submitted:', filters);
+    console.log('Filters:', filters);
+    // Ở đây bạn có thể gọi API filter
   };
 
-  const totalPages = Math.ceil(products.length / itemsPerPage);
-  const paginatedProducts = products.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  // Filter tạm (demo)
+  const filteredStocks = stocks.filter(stock =>
+    stock.name.toLowerCase().includes(filters.name.toLowerCase()) &&
+    (filters.city ? stock.city === filters.city : true)
+  );
+
+  const totalPages = Math.ceil(filteredStocks.length / itemsPerPage);
+  const paginatedStocks = filteredStocks.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div className="bg-gray-100 font-sans">
       <div className="max-w-full min-h-screen p-4 bg-gray-100">
         <div className="max-w-[1200px] mx-auto bg-white shadow-sm rounded-sm">
           <div className="bg-black text-white font-semibold text-lg px-6 py-3 select-none">
-            DANH SÁCH HÀNG HÓA
+            DANH SÁCH KHO HÀNG
           </div>
-
-          <FilterForm filters={filters} onChange={handleFilterChange} onSubmit={handleSubmit} />
-          <ProductTable products={paginatedProducts} currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+          <StockFilter filters={filters} onChange={handleFilterChange} onSubmit={handleSubmit} />
+          <StockTable stocks={paginatedStocks} currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </div>
       </div>
     </div>
   );
 };
 
-export default ProductList;
+export default StockList;

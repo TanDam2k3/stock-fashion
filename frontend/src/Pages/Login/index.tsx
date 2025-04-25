@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import CryptoJS from 'crypto-js';
 import Cookies from 'js-cookie';
 import SuccessPopup from '../../components/popup/SuccessPopup';
+import { API_END_POINT, ENCRYPT_KEY } from "../../config";
 
 type Inputs = {
   username: string;
@@ -15,8 +16,8 @@ const Login: React.FC = () => {
   const [remember, setRemember] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const navigate = useNavigate();
-  const API_END_POINT = import.meta.env.VITE_API_URL;
-  const ENCRYPT_KEY = import.meta.env.VITE_ENCRYPT_KEY;
+
+
 
   const {
     register,

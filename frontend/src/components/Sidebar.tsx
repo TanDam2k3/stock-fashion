@@ -111,7 +111,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
               {dropdownItem("add-product", "Thêm sản phẩm")}
             </ul>
           )}
-          {menuItem(<FaBoxes />, "Kho hàng", "/warehouse")}
+          {menuItem(<FaBoxes />, "Kho hàng", "stocks")}
    
           {menuItem(<GiClothes />, "Sản phẩm", "products")}
           
