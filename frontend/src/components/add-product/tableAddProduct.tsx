@@ -11,6 +11,7 @@ interface Product {
   status: "Active" | "Inactive";
   price: number;
   imagePreview?: string;
+  housewareStockId: string;
 }
 interface Stock {
   _id: string; 
@@ -20,13 +21,11 @@ interface Stock {
   createdAt: string;
   updatedAt: string;
   status: string; 
-}
-interface ProductsTableProps {
+}interface ProductsTableProps {
   products: Product[];
   onUpdateProduct: (updatedProduct: Product) => void;
   onDeleteProduct: (productId: string) => void;
   onClearAll: () => void;
-  housewareOptions: Stock[]; 
 }
 
 const ProductsTable: React.FC<ProductsTableProps> = ({ 
@@ -42,7 +41,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
     setCurrentProduct(product);
     setIsModalOpen(true);
   };
-
+console.log("products",products)
   const handleDeleteClick = (productId: string) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       onDeleteProduct(productId);
@@ -61,7 +60,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
       for (const product of products) {
         try {
           await createProduct({
-            housewareId: product.id,
+            housewareId:  product.housewareStockId,
             name: product.name,
             type: product.type,
             quantity: product.quantity,
@@ -145,7 +144,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{product.name}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.housewareId}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.id}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.housewareStockId}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.type}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.quantity}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.price.toFixed(2)}</td>

@@ -22,8 +22,10 @@ interface Stock {
 }
 interface Product extends Omit<ProductFormData, 'productImage'> {
   id: string;
+  housewareStockId: string;
   imagePreview?: string;
 }
+
 
 const AddProduct: React.FC = () => {
   const [housewareOptions, setHousewareOptions] = useState<Stock[]>([]);
@@ -73,13 +75,24 @@ const AddProduct: React.FC = () => {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    
+  
+    // Luôn tìm _id tương ứng với housewareId (name)
+    const selectedHouseware = housewareOptions.find(
+      (option) => option.name === formData.housewareId
+    );
+  
+    if (!selectedHouseware) {
+      console.error("Selected houseware not found");
+      return;
+    }
+  
     if (editingId) {
       // Update existing product
       setProducts(products.map(product => 
         product.id === editingId ? {
           ...product,
           housewareId: formData.housewareId,
+          housewareStockId: selectedHouseware._id, // update luôn stockId mới
           name: formData.name,
           type: formData.type,
           quantity: formData.quantity,
@@ -96,6 +109,7 @@ const AddProduct: React.FC = () => {
       const newProduct: Product = {
         id: Date.now().toString(),
         housewareId: formData.housewareId,
+        housewareStockId: selectedHouseware._id, // add luôn _id
         name: formData.name,
         type: formData.type,
         quantity: formData.quantity,
@@ -106,7 +120,7 @@ const AddProduct: React.FC = () => {
       
       setProducts([...products, newProduct]);
     }
-    
+  
     // Reset form
     setFormData({
       housewareId: "",
@@ -118,6 +132,7 @@ const AddProduct: React.FC = () => {
       productImage: null,
     });
   };
+  
 
   const handleUpdateProduct = (updatedProduct: Product) => {
     setEditingId(updatedProduct.id);
@@ -385,7 +400,7 @@ const AddProduct: React.FC = () => {
         onUpdateProduct={handleUpdateProduct}
         onDeleteProduct={handleDeleteProduct}
         onClearAll={handleClearAllProducts}
-        housewareOptions={housewareOptions} // 👈 thêm dòng này
+ 
       />
     </div>
   );
