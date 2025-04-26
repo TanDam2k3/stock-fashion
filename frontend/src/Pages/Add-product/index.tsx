@@ -295,17 +295,17 @@ const AddProduct: React.FC = () => {
               >
                 Status
               </label>
-              <select
-                id="status"
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-                className="w-full rounded-md border border-gray-200 bg-white px-4 py-2 text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#0a162c] focus:border-transparent"
-                required
-              >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
+              <input
+  type="hidden"
+  name="status"
+  value="Active"
+/>
+<div
+  className="w-full rounded-md border border-gray-200 bg-gray-200 px-4 py-2 text-gray-500 "
+>
+  Active
+</div>
+
             </div>
             
             {/* Price */}
@@ -317,16 +317,19 @@ const AddProduct: React.FC = () => {
                 Price
               </label>
               <input
-                id="price"
-                name="price"
-                type="number"
-                min="0"
-                step="0.01"
-                value={formData.price}
-                onChange={handleChange}
-                className="w-full rounded-md border border-gray-200 bg-white px-4 py-2 text-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0a162c] focus:border-transparent"
-                required
-              />
+  id="price"
+  name="price"
+  type="number"
+  min="0"
+  step="1"
+  value={formData.price}
+  onChange={handleChange}
+  className="w-full rounded-md border border-gray-200 bg-white px-4 py-2 text-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0a162c] focus:border-transparent appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-moz-appearance:textfield]"
+  required
+/>
+
+
+
             </div>
           </div>
           

@@ -1,13 +1,11 @@
 import React from 'react';
-import { IoSearch } from 'react-icons/io5';
 
 interface FilterProps {
   filters: {
-    maPhieu: string;
-    nguonNhan: string;
-    tinhTrang: string;
-    tuNgay: string;
-    denNgay: string;
+    name: string;
+    type: string;
+    createdAt: string;
+    city: string; // Thêm city vào filter
   };
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   onSubmit: (e: React.FormEvent) => void;
@@ -20,70 +18,56 @@ const FilterForm: React.FC<FilterProps> = ({ filters, onChange, onSubmit }) => {
       autoComplete="off"
       onSubmit={onSubmit}
     >
-      {/* Mã phiếu */}
+      {/* Tên hàng hóa */}
       <div className="col-span-1">
-        <label className="block text-sm text-gray-700 mb-1">Mã phiếu</label>
+        <label className="block text-sm text-gray-700 mb-1">Tên hàng hóa</label>
         <input
           type="text"
-          name="maPhieu"
-          value={filters.maPhieu}
+          name="name"
+          value={filters.name}
           onChange={onChange}
           className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
-      {/* Nguồn nhận */}
+      {/* Loại hàng hóa */}
       <div className="col-span-1">
-        <label className="block text-sm text-gray-700 mb-1">Nguồn nhận</label>
+        <label className="block text-sm text-gray-700 mb-1">Loại hàng hóa</label>
+        <input
+          type="text"
+          name="type"
+          value={filters.type}
+          onChange={onChange}
+          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      {/* Ngày tạo */}
+      <div className="col-span-1">
+        <label className="block text-sm text-gray-700 mb-1">Ngày tạo</label>
+        <input
+          type="date"
+          name="createdAt"
+          value={filters.createdAt}
+          onChange={onChange}
+          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      {/* Thành phố */}
+      <div className="col-span-1">
+        <label className="block text-sm text-gray-700 mb-1">Thành phố</label>
         <select
-          name="nguonNhan"
-          value={filters.nguonNhan}
+          name="city"
+          value={filters.city}
           onChange={onChange}
           className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="80">80</option>
+          <option value="">Chọn thành phố</option>
+          <option value="Hanoi">Hà Nội</option>
+          <option value="HoChiMinh">TP.HCM</option>
+          {/* Thêm các thành phố khác ở đây */}
         </select>
-      </div>
-
-      {/* Tình trạng */}
-      <div className="col-span-1">
-        <label className="block text-sm text-gray-700 mb-1">Tình trạng</label>
-        <select
-          name="tinhTrang"
-          value={filters.tinhTrang}
-          onChange={onChange}
-          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value=""></option>
-        </select>
-      </div>
-
-      {/* Từ ngày */}
-      <div className="col-span-1">
-        <label className="block text-sm text-gray-700 mb-1">Từ ngày</label>
-        <div className="flex items-center gap-2">
-          <input
-            type="date"
-            name="tuNgay"
-            value={filters.tuNgay}
-            onChange={onChange}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-      </div>
-
-      {/* Đến ngày */}
-      <div className="col-span-1">
-        <label className="block text-sm text-gray-700 mb-1">Đến ngày</label>
-        <div className="flex items-center gap-2">
-          <input
-            type="date"
-            name="denNgay"
-            value={filters.denNgay}
-            onChange={onChange}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
       </div>
 
       {/* Nút tìm kiếm */}
@@ -92,7 +76,6 @@ const FilterForm: React.FC<FilterProps> = ({ filters, onChange, onSubmit }) => {
           type="submit"
           className="flex items-center font-medium justify-center gap-2 w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white text-sm rounded-md px-6 py-2"
         >
-            <IoSearch />
           Tìm kiếm
         </button>
       </div>

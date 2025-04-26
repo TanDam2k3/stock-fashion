@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { createProduct } from "../../api/api-product";
+import { createProduct, uploadImage } from "../../api/api-product";
 import { toast } from "react-toastify";
+import { MdUploadFile } from "react-icons/md";
 
 interface Product {
   id: string;
@@ -52,33 +53,46 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
       alert("No products to create!");
       return;
     }
-
+  
     if (window.confirm("Are you sure you want to create all products to DB and clear the table?")) {
       let successCount = 0;
-
+  
       for (const product of products) {
         try {
+          let fileId = ''; 
+  
+          if (product.imagePreview) {
+            const blob = await fetch(product.imagePreview).then(res => res.blob());
+            const file = new File([blob], 'product.jpg', { type: blob.type });
+  
+            const uploadRes = await uploadImage(file);
+            fileId = uploadRes.file._id; 
+          }
+  
           await createProduct({
             housewareId: product.housewareStockId,
             name: product.name,
             type: product.type,
             quantity: product.quantity,
-            status: 'active',
-            fileId: '',
+            status: 'Active', 
             price: product.price,
+            fileId,
           });
+  
           successCount++;
-          toast.success('create successfully')
         } catch (error) {
           console.error(`❌ Failed to create product "${product.name}":`, error);
         }
       }
-
-      alert(`✅ Created ${successCount} / ${products.length} products to DB.`);
-      onClearAll(); // clear table
+  
+      // Thông báo tổng kết chỉ một lần
+      toast.success(`✅ Created ${successCount} / ${products.length} products to DB.`);
+  
+      // Clear bảng sau khi tạo xong
+      onClearAll(); 
     }
   };
-
+  
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setCurrentProduct(prev => ({

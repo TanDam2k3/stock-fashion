@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import StockFilter from '../../components/stock/filter';
 import StockTable from '../../components/stock/table';
 import { deleteStock, fetchStockList, updateStock } from '../../api/api-stock';
-import ConfirmDeletePopup from '../../components/stock/confirm-deleted-popup';
+import ConfirmDeletePopup from '../../components/popup/confirm-deleted-popup';
 import EditStockPopup from '../../components/stock/edit-popup';
 
 interface Stock {
