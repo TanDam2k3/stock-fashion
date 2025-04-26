@@ -7,10 +7,10 @@ import Register from "./Pages/Register";
 import Contact from "./Pages/Contact/Contact";
 import Home from "./Pages/Home";
 import AddProduct from "./Pages/Add-product";
-import AddStock from "./Pages/Add-stock";
 import ProductList from "./Pages/ProductList";
 import ProtectedRoute from "./utils/auth/ProtectedRoute";
 import StockList from "./Pages/Stock";
+import CreateStock from './Pages/Stock/create'
 
 const App = () => {
   return (
@@ -23,9 +23,12 @@ const App = () => {
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="add-product" element={<AddProduct />} />
-            <Route path="add-stock" element={<AddStock />} />
             <Route path="products" element={<ProductList />} />
+
             <Route path="stocks" element={<StockList />} />
+            <Route path="stocks/create" element={<CreateStock />} />
+
+
             <Route path="contact" element={<Contact />} />
           </Route>
         </Route>
