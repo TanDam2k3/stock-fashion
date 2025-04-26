@@ -1,19 +1,23 @@
+const { ObjectId } = require('mongodb');
 const productModel = require('../models/Product');
 const httpErrorService = require('./httpErrorService');
 const fileService = require('./fileService');
+
+const isValidObjectId = (id) => ObjectId.isValid(id) && (String)(new ObjectId(id)) === id;
 
 const create = async (payload) => {
   try {
     if (!payload) return null;
     const data = {
-      housewareId: payload?.housewareId || null,
+      housewareId: isValidObjectId(payload?.housewareId) ? new ObjectId(payload.housewareId) : null,
       name: payload?.name || null,
       type: payload?.type,
       quantity: payload?.quantity || 0,
       status: 'active',
-      fileId: payload?.fileId,
+      fileId: isValidObjectId(payload?.fileId) ? new ObjectId(payload.fileId) : null,
       price: payload?.price || 0
     };
+
     const product = await productModel.create(data);
     return product;
   } catch (e) {

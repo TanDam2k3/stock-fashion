@@ -5,6 +5,9 @@ const productSchema = new mongoose.Schema(
     housewareId: {
       type: mongoose.Schema.Types.ObjectId
     },
+    fileId: {
+      type: mongoose.Schema.Types.ObjectId
+    },
     name: {
       type: String
     },
@@ -17,9 +20,6 @@ const productSchema = new mongoose.Schema(
     },
     status: {
       type: String
-    },
-    fileId: {
-      type: mongoose.Schema.Types.ObjectId
     },
     price: {
       type: Number,

@@ -14,13 +14,13 @@ interface Product {
   housewareStockId: string;
 }
 interface Stock {
-  _id: string; 
+  _id: string;
   name: string;
   city: string;
   address: string;
   createdAt: string;
   updatedAt: string;
-  status: string; 
+  status: string;
 }interface ProductsTableProps {
   products: Product[];
   onUpdateProduct: (updatedProduct: Product) => void;
@@ -28,9 +28,9 @@ interface Stock {
   onClearAll: () => void;
 }
 
-const ProductsTable: React.FC<ProductsTableProps> = ({ 
-  products, 
-  onUpdateProduct, 
+const ProductsTable: React.FC<ProductsTableProps> = ({
+  products,
+  onUpdateProduct,
   onDeleteProduct,
   onClearAll
 }) => {
@@ -41,7 +41,6 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
     setCurrentProduct(product);
     setIsModalOpen(true);
   };
-console.log("products",products)
   const handleDeleteClick = (productId: string) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       onDeleteProduct(productId);
@@ -53,19 +52,19 @@ console.log("products",products)
       alert("No products to create!");
       return;
     }
-  
+
     if (window.confirm("Are you sure you want to create all products to DB and clear the table?")) {
       let successCount = 0;
-  
+
       for (const product of products) {
         try {
           await createProduct({
-            housewareId:  product.housewareStockId,
+            housewareId: product.housewareStockId,
             name: product.name,
             type: product.type,
             quantity: product.quantity,
             status: 'active',
-            fileId:'',
+            fileId: '',
             price: product.price,
           });
           successCount++;
@@ -74,12 +73,12 @@ console.log("products",products)
           console.error(`❌ Failed to create product "${product.name}":`, error);
         }
       }
-  
+
       alert(`✅ Created ${successCount} / ${products.length} products to DB.`);
       onClearAll(); // clear table
     }
   };
-  
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setCurrentProduct(prev => ({
@@ -101,15 +100,15 @@ console.log("products",products)
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-black text-xl font-semibold">Products List</h2>
         <div className="flex justify-between items-center mb-6">
-  <div className="flex gap-3">
-    <button
-      onClick={handleCreateAllProducts}
-      className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md text-sm"
-    >
-      Create All to DB
-    </button>
-  </div>
-</div>
+          <div className="flex gap-3">
+            <button
+              onClick={handleCreateAllProducts}
+              className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md text-sm"
+            >
+              Create All to DB
+            </button>
+          </div>
+        </div>
 
       </div>
       <div className="overflow-x-auto">
