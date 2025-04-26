@@ -1,5 +1,9 @@
 import axios from "axios";
-import { API_END_POINT, TOKEN } from '../config';
+import { API_END_POINT } from '../config';
+import Cookies from 'js-cookie';
+
+
+const TOKEN = Cookies.get('token') || null;
 
 export interface ProductPayload {
   housewareId: string;

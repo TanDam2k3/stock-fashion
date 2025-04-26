@@ -39,10 +39,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
     dropdownKey?: string
   ) => (
     <li
-    className={`p-4 hover:bg-primary-th1/40 transition-colors duration-300 ease-in-out cursor-pointer flex items-center ${
-      isOpen ? "justify-between" : "justify-center"
-    }`}
-    
+      className={`p-4 hover:bg-primary-th1/40 transition-colors duration-300 ease-in-out cursor-pointer flex items-center ${isOpen ? "justify-between" : "justify-center"
+        }`}
+
       onClick={onClick}
     >
       {to ? (
@@ -56,7 +55,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
           {isOpen && <span>{label}</span>}
         </div>
       )}
-  
+
       {/* Icon bên phải */}
       {isOpen &&
         hasDropdown &&
@@ -67,12 +66,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         ))}
     </li>
   );
-  
-  
+
+
 
   const dropdownItem = (to: string, label: string) => (
-<li className="p-2 hover:bg-primary-th1/40 transition-colors duration-300 ease-in-out">
-<Link to={to} className="flex items-center gap-2">
+    <li className="p-2 hover:bg-primary-th1/40 transition-colors duration-300 ease-in-out">
+      <Link to={to} className="flex items-center gap-2">
         <MdArrowForwardIos /> {label}
       </Link>
     </li>
@@ -81,49 +80,48 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   return (
 
     <div
-      className={`fixed top-0 font-medium left-0 h-full bg-custom-sidebar text-white transform transition-all duration-300 ease-in-out ${
-        isOpen ? "w-64" : "w-16"
-      }`}
+      className={`fixed top-0 font-medium left-0 h-full bg-custom-sidebar text-white transform transition-all duration-300 ease-in-out ${isOpen ? "w-64" : "w-16"
+        }`}
     >
-         
-<div className="flex justify-end p-4">
-  <button onClick={toggleSidebar} className="text-2xl text-white">
-    {isOpen ? <IoArrowBackOutline /> : <IoArrowForwardOutline />}
-  </button>
-</div>
-<div className="flex justify-center items-center">
-<img  src={logo} alt="Logo" className="w-[150px] h-[150px]" />
-</div>
+
+      <div className="flex justify-end p-4">
+        <button onClick={toggleSidebar} className="text-2xl text-white">
+          {isOpen ? <IoArrowBackOutline /> : <IoArrowForwardOutline />}
+        </button>
+      </div>
+      <div className="flex justify-center items-center">
+        <img src={logo} alt="Logo" className="w-[150px] h-[150px]" />
+      </div>
 
 
 
 
       <nav className="mt-2">
         <ul>
-        {menuItem(<FaHome />, "Tổng quan", "/")}
-        {menuItem(<IoIosAddCircle />, "Thêm", undefined, () =>
-  toggleDropdown("add"), true, "add"
-)}
+          {menuItem(<FaHome />, "Tổng quan", "/")}
+          {menuItem(<IoIosAddCircle />, "Thêm", undefined, () =>
+            toggleDropdown("add"), true, "add"
+          )}
 
           {openDropdown === "add" && isOpen && (
             <ul className="ml-8">
-              {dropdownItem("add-stock", "Thêm kho hàng")}
+              {dropdownItem("stocks/create", "Thêm kho hàng")}
               {dropdownItem("add-product", "Thêm sản phẩm")}
             </ul>
           )}
           {menuItem(<FaBoxes />, "Kho hàng", "stocks")}
-   
+
           {menuItem(<GiClothes />, "Sản phẩm", "products")}
-          
 
 
 
-        
+
+
 
           {/* Phiếu báo cáo */}
           {menuItem(<FaChartLine />, "Lịch sử giao dịch", undefined, () =>
-  toggleDropdown("report"), true, "report"
-)}
+            toggleDropdown("report"), true, "report"
+          )}
           {openDropdown === "report" && isOpen && (
             <ul className="ml-8">
               {dropdownItem("/report/import", "Nhập kho")}

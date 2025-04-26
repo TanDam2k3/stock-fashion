@@ -39,7 +39,6 @@ const Register: React.FC = () => {
       };
 
       const response = await axios.post(`${API_END_POINT}/api/auth/register`, payload);
-      console.log('register', response);
 
       if (response.data === true) {
         setShowPopup(true);
