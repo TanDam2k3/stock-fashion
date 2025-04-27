@@ -5,14 +5,12 @@ import LoadingPage from "./PagesState/LoadingPage";
 import Sidebar from "./Sidebar";
 
 const Layout = () => {
-  // const { width } = useWindowDimensions();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   return (
     <div className="flex w-screen h-screen bg-primary-gray-th1 overflow-hidden">
-      {/* Sidebar luôn chiếm 1 phần bên trái */}
       <div
         className={`transition-all duration-300 ${isSidebarOpen ? "w-64" : "w-16"
           } bg-primary-gray-th2`}

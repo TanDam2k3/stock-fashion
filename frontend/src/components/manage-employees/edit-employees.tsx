@@ -24,7 +24,7 @@ const EditEmployeePopup: React.FC<EditEmployeePopupProps> = ({ employee, onClose
   });
 
   const onSubmit = (data: Employee) => {
-    onSave(data);  // Gửi dữ liệu cho component cha
+    onSave(data); 
   };
 
   return (
