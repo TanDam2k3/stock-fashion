@@ -2,9 +2,7 @@ const bcrypt = require('bcryptjs');
 const CryptoJS = require('crypto-js');
 
 const hashPassword = async (password) => {
-  console.log('password', password);
   const salt = await bcrypt.genSalt(10);
-  console.log('salt', salt);
   const hash = await bcrypt.hash(password, salt);
   return hash;
 };
