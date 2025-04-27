@@ -1,7 +1,6 @@
 const multer = require('multer');
 const sharp = require('sharp');
 const path = require('path');
-const fs = require('fs');
 const httpErrorService = require('../services/httpErrorService');
 
 // Dùng memoryStorage để giữ file trong RAM (chưa ghi ra disk)

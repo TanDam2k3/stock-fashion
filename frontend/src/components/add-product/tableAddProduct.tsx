@@ -1,113 +1,123 @@
-import React, { useState } from "react";
-import { createProduct, uploadImage } from "../../api/api-product";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { MdUploadFile } from "react-icons/md";
+import { productService } from "../../services";
+import { Houseware, ICreateProduct } from "../../interfaces";
+import { SubmitHandler, useForm } from "react-hook-form";
 
-interface Product {
-  id: string;
-  housewareId: string;
-  name: string;
-  type: string;
-  quantity: number;
-  status: "Active" | "Inactive";
-  price: number;
-  imagePreview?: string;
-  housewareStockId: string;
-}
-interface Stock {
-  _id: string;
-  name: string;
-  city: string;
-  address: string;
-  createdAt: string;
-  updatedAt: string;
-  status: string;
-}interface ProductsTableProps {
-  products: Product[];
-  onUpdateProduct: (updatedProduct: Product) => void;
+interface ProductsTableProps {
+  products: ICreateProduct[];
+  onUpdateProduct: (updatedProduct: ICreateProduct) => void;
   onDeleteProduct: (productId: string) => void;
   onClearAll: () => void;
+  housewareOptions: Houseware[];
+}
+
+type Inputs = {
+  housewareId: string,
+  name: string,
+  type: string,
+  quantity: number,
+  price: number,
+  file: File[] | null
 }
 
 const ProductsTable: React.FC<ProductsTableProps> = ({
   products,
   onUpdateProduct,
   onDeleteProduct,
-  onClearAll
+  onClearAll,
+  housewareOptions,
 }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch
+  } = useForm<Inputs>({
+    defaultValues: {
+      name: '',
+      housewareId: '',
+      type: '',
+      quantity: 0,
+      price: 0,
+      file: null,
+    }
+  });
 
-  const handleUpdateClick = (product: Product) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentProduct, setCurrentProduct] = useState<ICreateProduct | null>(null);
+  const watchedFile = watch('file');
+
+
+  const handleUpdateClick = (product: ICreateProduct) => {
     setCurrentProduct(product);
     setIsModalOpen(true);
   };
-  const handleDeleteClick = (productId: string) => {
+
+  const handleDeleteClick = (identification: string) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
-      onDeleteProduct(productId);
+      onDeleteProduct(identification);
     }
   };
-
   const handleCreateAllProducts = async () => {
     if (products.length === 0) {
       alert("No products to create!");
       return;
     }
-  
-    if (window.confirm("Are you sure you want to create all products to DB and clear the table?")) {
-      let successCount = 0;
-  
-      for (const product of products) {
-        try {
-          let fileId = ''; 
-  
-          if (product.imagePreview) {
-            const blob = await fetch(product.imagePreview).then(res => res.blob());
-            const file = new File([blob], 'product.jpg', { type: blob.type });
-  
-            const uploadRes = await uploadImage(file);
-            fileId = uploadRes.file._id; 
-          }
-  
-          await createProduct({
-            housewareId: product.housewareStockId,
-            name: product.name,
-            type: product.type,
-            quantity: product.quantity,
-            status: 'Active', 
-            price: product.price,
-            fileId,
-          });
-  
-          successCount++;
-        } catch (error) {
-          console.error(`❌ Failed to create product "${product.name}":`, error);
+    const confirm = window.confirm("Are you sure you want to create all products to DB and clear the table?");
+    if (!confirm) return;
+    let successCount = 0;
+
+    await products.reduce(async (lp, product) => {
+      await lp;
+      try {
+        let file = null;
+
+        if (product.file) {
+          file = await productService.uploadImage(product.file);
         }
+        console.log('file', file)
+        await productService.create({
+          housewareId: product.housewareId,
+          name: product.name,
+          type: product.type,
+          quantity: product.quantity,
+          status: 'Active',
+          price: product.price,
+          fileId: file?.file?._id || null
+        });
+
+        successCount++;
+      } catch (error) {
+        console.error(`Failed to create product "${product.name}":`, error);
       }
-  
-      // Thông báo tổng kết chỉ một lần
-      toast.success(`✅ Created ${successCount} / ${products.length} products to DB.`);
-  
-      // Clear bảng sau khi tạo xong
-      onClearAll(); 
-    }
-  };
-  
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setCurrentProduct(prev => ({
-      ...prev!,
-      [name]: name === 'quantity' || name === 'price' ? Number(value) : value
-    }));
+    }, Promise.resolve());
+
+    toast.success(`Created ${successCount} / ${products.length} products to DB.`);
+    onClearAll();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    if (!data) return;
     if (currentProduct) {
-      onUpdateProduct(currentProduct);
+      const updated = { ...currentProduct, ...data } as ICreateProduct;
+      onUpdateProduct(updated);
       setIsModalOpen(false);
     }
-  };
+  }
+
+  useEffect(() => {
+    if (currentProduct) {
+      reset({
+        name: currentProduct.name,
+        housewareId: currentProduct.housewareId,
+        type: currentProduct.type,
+        quantity: currentProduct.quantity,
+        price: currentProduct.price,
+        file: currentProduct.file ? [currentProduct.file] : null
+      });
+    }
+  }, [currentProduct, reset]);
 
   return (
     <div className="w-full rounded-md bg-white p-5">
@@ -129,23 +139,19 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
         <table className="min-w-full bg-white border border-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Houseware Name</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Houseware_ID</th>
-
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {products.map((product) => (
-              <tr key={product.id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.id}</td>
+            {products?.length > 0 && products.map((product) => (
+              <tr key={product.identification}>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {product.imagePreview ? (
                     <img src={product.imagePreview} alt="Product" className="h-10 w-10 rounded-md object-cover" />
@@ -155,18 +161,13 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
                     </div>
                   )}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{product.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.housewareId}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.housewareStockId}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.type}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.quantity}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.price.toFixed(2)}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                    ${product.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                    {product.status}
-                  </span>
-                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{product?.name}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{product?.housewareName}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product?.housewareId}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product?.type}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product?.quantity}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product?.price ? product.price : 0}</td>
+
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <button
                     onClick={() => handleUpdateClick(product)}
@@ -175,7 +176,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
                     Update
                   </button>
                   <button
-                    onClick={() => handleDeleteClick(product.id)}
+                    onClick={() => product?.identification && handleDeleteClick(product.identification)}
                     className="text-red-600 hover:text-red-900"
                   >
                     Delete
@@ -196,7 +197,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
             </div>
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Update Product</h3>
                   <div className="grid grid-cols-1 gap-y-4">
@@ -204,71 +205,94 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
                       <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
                       <input
                         type="text"
-                        name="name"
                         id="name"
                         value={currentProduct.name}
-                        onChange={handleInputChange}
                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        {...register("name", { required: true })}
                       />
                     </div>
                     <div>
-                      <label htmlFor="housewareId" className="block text-sm font-medium text-gray-700">Houseware ID</label>
-                      <input
-                        type="text"
-                        name="housewareId"
+                      <label htmlFor="housewareId" className="block text-sm font-medium text-gray-700">Houseware</label>
+                      <select
                         id="housewareId"
-                        value={currentProduct.housewareId}
-                        onChange={handleInputChange}
-                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      />
+                        className="w-full rounded-md border border-gray-200 bg-white px-4 py-2 text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#0a162c] focus:border-transparent"
+                        {...register("housewareId", { required: true })}
+                      >
+                        <option value="" disabled>
+                          Select houseware
+                        </option>
+                        {housewareOptions.map((option) => (
+                          <option key={option._id} value={option._id}>
+                            {option.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div>
                       <label htmlFor="type" className="block text-sm font-medium text-gray-700">Type</label>
-                      <input
-                        type="text"
-                        name="type"
+                      <select
                         id="type"
-                        value={currentProduct.type}
-                        onChange={handleInputChange}
-                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      />
+                        className="w-full rounded-md border border-gray-200 bg-white px-4 py-2 text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#0a162c] focus:border-transparent"
+                        {...register("type", { required: true })}
+                      >
+                        <option value="" disabled>
+                          Select type
+                        </option>
+                        <option>Áo</option>
+                        <option>Áo khoác</option>
+                        <option>Quần</option>
+                      </select>
                     </div>
                     <div>
                       <label htmlFor="quantity" className="block text-sm font-medium text-gray-700">Quantity</label>
                       <input
                         type="number"
-                        name="quantity"
                         id="quantity"
                         value={currentProduct.quantity}
-                        onChange={handleInputChange}
                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        {...register("quantity", { required: true, min: 1 })}
                       />
                     </div>
                     <div>
                       <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price</label>
                       <input
                         type="number"
-                        name="price"
                         id="price"
                         step="0.01"
                         value={currentProduct.price}
-                        onChange={handleInputChange}
                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        {...register("price", { required: true, min: 1 })}
                       />
                     </div>
-                    <div>
-                      <label htmlFor="status" className="block text-sm font-medium text-gray-700">Status</label>
-                      <select
-                        name="status"
-                        id="status"
-                        value={currentProduct.status}
-                        onChange={handleInputChange}
-                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      >
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                      </select>
+
+                    <div className="flex items-center gap-4">
+                      <input
+                        id="productImage"
+                        type="file"
+                        accept="image/*"
+                        className="flex-1 rounded-md border border-gray-200 bg-white text-gray-700 file:bg-[#0a162c] file:text-white file:px-4 file:py-2 file:rounded-l-md file:border-none file:cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0a162c] focus:border-transparent"
+                        {...register("file")}
+                      />
+                      {watchedFile && watchedFile.length > 0 ? (
+                        <img
+                          src={URL.createObjectURL(watchedFile[0])}
+                          alt="Preview"
+                          className="w-14 h-14 rounded-md object-cover"
+                        />
+                      ) : currentProduct.imagePreview ? (
+                        <img
+                          src={currentProduct.imagePreview}
+                          alt="Current Preview"
+                          className="w-14 h-14 rounded-md object-cover"
+                        />
+                      ) : (
+                        <div className="w-14 h-14 rounded-md border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-2xl cursor-pointer">
+                          <i className="far fa-image" aria-hidden="true"></i>
+                          <span className="sr-only">Product image icon</span>
+                        </div>
+                      )}
                     </div>
+
                   </div>
                 </div>
                 <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">

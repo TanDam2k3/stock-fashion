@@ -37,7 +37,7 @@ const getList = async (query) => {
     const filesMap = new Map(files.map((f) => [`${f._id}`, f.fileUrl])) || new Map();
     const dataRespont = data.map((d) => ({
       ...d,
-      imageUrl: `${process.env.DOMAIN}/${filesMap.get(d.fileId)}`
+      imageUrl: `${process.env.DOMAIN}/${filesMap.get(`${d.fileId}`)}`
     }));
     return dataRespont;
   } catch (e) {

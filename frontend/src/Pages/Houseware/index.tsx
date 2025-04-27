@@ -2,18 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import StockFilter from '../../components/stock/filter';
 import StockTable from '../../components/stock/table';
-import { deleteStock, fetchStockList, updateStock } from '../../api/api-stock';
+import { housewareService } from '../../services/api-housewares';
 import ConfirmDeletePopup from '../../components/popup/confirm-deleted-popup';
 import EditStockPopup from '../../components/stock/edit-popup';
-
-interface Stock {
-  _id: string;
-  name: string;
-  city: string;
-  address: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import { Houseware } from '../../interfaces';
 
 const StockList: React.FC = () => {
   const [filters, setFilters] = useState({
@@ -22,20 +14,23 @@ const StockList: React.FC = () => {
     createdAt: ''
   });
 
-  const [stocks, setStocks] = useState<Stock[]>([]);
+  const [stocks, setStocks] = useState<Houseware[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [stockToDelete, setStockToDelete] = useState<string | null>(null);
 
   const [showEditPopup, setShowEditPopup] = useState(false);
-  const [stockToEdit, setStockToEdit] = useState<Stock | null>(null);
+  const [stockToEdit, setStockToEdit] = useState<Houseware | null>(null);
   const [formData, setFormData] = useState({ name: '', address: '', city: '' });
 
   const itemsPerPage = 10;
 
-  const fetchStocks = async () => {
+  const getListHouseware = async () => {
     try {
-      const stockList = await fetchStockList();
+      const stockList = await housewareService.getListHouseware({
+        status: "active"
+      });
+      console.log('stockList', stockList)
       setStocks(stockList);
     } catch (error) {
       console.error('Error fetching stock list:', error);
@@ -43,7 +38,7 @@ const StockList: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchStocks();
+    getListHouseware();
   }, []);
 
   // DELETE
@@ -55,10 +50,10 @@ const StockList: React.FC = () => {
   const handleDelete = async () => {
     if (!stockToDelete) return;
 
-    const response = await deleteStock(stockToDelete);
+    const response = await housewareService.delete(stockToDelete);
     if (response) {
       toast.success("Deleted successfully!");
-      fetchStocks();
+      getListHouseware();
     } else {
       toast.warning("Delete failed!");
     }
@@ -70,7 +65,7 @@ const StockList: React.FC = () => {
   };
 
   // EDIT
-  const handleEditClick = (stock: Stock) => {
+  const handleEditClick = (stock: Houseware) => {
     setStockToEdit(stock);
     setFormData({
       name: stock.name,
@@ -84,7 +79,7 @@ const StockList: React.FC = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  
+
 
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,16 +88,15 @@ const StockList: React.FC = () => {
     const updatedStock = {
       _id: stockToEdit._id,
       ...formData,
-    };
+    } as unknown as Houseware;
 
-    const response = await updateStock(updatedStock);
+    const response = await housewareService.update(updatedStock);
     if (response?.message?.includes('success')) {
       toast.success("updated successfully!!");
-      fetchStocks();
+      getListHouseware();
     } else {
       toast.warning("update failed");
     }
-
     setShowEditPopup(false);
   };
 

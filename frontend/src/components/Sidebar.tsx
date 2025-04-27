@@ -106,7 +106,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
           {openDropdown === "add" && isOpen && (
             <ul className="ml-8">
               {dropdownItem("stocks/create", "Thêm kho hàng")}
-              {dropdownItem("add-product", "Thêm sản phẩm")}
+              {dropdownItem("products/create", "Thêm sản phẩm")}
             </ul>
           )}
           {menuItem(<FaBoxes />, "Kho hàng", "stocks")}

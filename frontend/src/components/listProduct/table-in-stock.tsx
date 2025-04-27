@@ -1,15 +1,6 @@
 import React from 'react';
 import { FaSort, FaEdit, FaTrashAlt } from 'react-icons/fa';
-
-interface Product {
-  _id: string; 
-  imageUrl: string; 
-  name: string | null; 
-  type: string; 
-  quantity: number; 
-  price: number; 
-  status: string; 
-}
+import { Product } from '../../interfaces';
 
 interface TableProps {
   products: Product[];
@@ -17,7 +8,7 @@ interface TableProps {
   totalPages: number;
   onPageChange: (page: number) => void;
   onDelete: (id: string) => void;
-  onEdit: (product: Product) => void; // 👈 thêm prop onEdit
+  onEdit: (product: Product) => void;
 }
 
 const ProductTable: React.FC<TableProps> = ({ products, currentPage, totalPages, onPageChange, onDelete, onEdit }) => {
@@ -48,7 +39,7 @@ const ProductTable: React.FC<TableProps> = ({ products, currentPage, totalPages,
                 <td className="py-4">{product.name || 'Chưa có tên'}</td>
                 <td className="py-4">{product.type}</td>
                 <td className="py-4">{product.quantity}</td>
-                <td className="py-4">{product.price.toLocaleString()} VND</td>
+                <td className="py-4">{product?.price ? product.price.toLocaleString() : 0} VND</td>
                 <td className="py-4">{product.status}</td>
                 <td className="pr-6 py-4 space-x-3">
                   <button
@@ -58,7 +49,7 @@ const ProductTable: React.FC<TableProps> = ({ products, currentPage, totalPages,
                     <FaEdit size={20} />
                   </button>
                   <button
-                    onClick={() => onDelete(product._id)}
+                    onClick={() => product?._id && onDelete(product._id)}
                     className="text-red-500 hover:scale-125"
                   >
                     <FaTrashAlt size={20} />

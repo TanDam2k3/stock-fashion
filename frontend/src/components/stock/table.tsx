@@ -1,22 +1,15 @@
 import React from 'react';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
+import { Houseware } from '../../interfaces';
 
-interface Stock {
-  _id: string;
-  name: string;
-  city: string;
-  address: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 interface TableProps {
-  stocks: Stock[];
+  stocks: Houseware[];
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
   onDelete: (id: string) => void;
-  onEdit: (stock: Stock) => void; // ✅ thêm prop onEdit
+  onEdit: (stock: Houseware) => void; // ✅ thêm prop onEdit
 }
 
 const StockTable: React.FC<TableProps> = ({
@@ -52,9 +45,8 @@ const StockTable: React.FC<TableProps> = ({
               stocks.map((stock, index) => (
                 <tr
                   key={stock._id}
-                  className={`${
-                    index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-                  } border border-gray-200 rounded-md`}
+                  className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                    } border border-gray-200 rounded-md`}
                 >
                   <td className="px-4 py-2">{stock.name}</td>
                   <td className="px-4 py-2">{stock.city}</td>
@@ -88,11 +80,10 @@ const StockTable: React.FC<TableProps> = ({
           <button
             key={page}
             onClick={() => onPageChange(page)}
-            className={`w-10 h-10 rounded-md font-semibold text-sm ${
-              page === currentPage
-                ? 'bg-purple-600 text-white hover:bg-purple-700'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
+            className={`w-10 h-10 rounded-md font-semibold text-sm ${page === currentPage
+              ? 'bg-purple-600 text-white hover:bg-purple-700'
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
           >
             {page}
           </button>

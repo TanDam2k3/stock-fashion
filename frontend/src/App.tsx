@@ -6,11 +6,11 @@ import Login from "./Pages/Login";
 import Register from "./Pages/Register";
 import Contact from "./Pages/Contact/Contact";
 import Home from "./Pages/Home";
-import AddProduct from "./Pages/Add-product";
-import ProductList from "./Pages/ProductList";
+import CreateProdct from "./Pages/Products/create";
+import Products from "./Pages/Products";
 import ProtectedRoute from "./utils/auth/ProtectedRoute";
-import StockList from "./Pages/Stock";
-import CreateStock from './Pages/Stock/create'
+import Housewares from "./Pages/Houseware";
+import CreateStock from './Pages/Houseware/create'
 
 const App = () => {
   return (
@@ -22,12 +22,12 @@ const App = () => {
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
-            <Route path="add-product" element={<AddProduct />} />
-            <Route path="products" element={<ProductList />} />
 
-            <Route path="stocks" element={<StockList />} />
+            <Route path="products" element={<Products />} />
+            <Route path="products/create" element={<CreateProdct />} />
+
+            <Route path="stocks" element={<Housewares />} />
             <Route path="stocks/create" element={<CreateStock />} />
-
 
             <Route path="contact" element={<Contact />} />
           </Route>

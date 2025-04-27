@@ -1,43 +1,31 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import React, { useState, useEffect } from 'react';
 import FilterForm from '../../components/listProduct/filter';
 import ProductTable from '../../components/listProduct/table-in-stock';
 import ConfirmDeletePopup from '../../components/popup/confirm-deleted-popup';
-import { getListProducts, deleteProduct, updateProduct } from '../../api/api-product'; 
 import { toast } from 'react-toastify';
 import EditProductPopup from '../../components/listProduct/edit-popup-product';
+import { productService } from '../../services';
+import { Product, ProductSearchPayload } from '../../interfaces';
 
 const ProductList: React.FC = () => {
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<ProductSearchPayload>({
     name: '',
     type: '',
-    createdAt: '',
-    city: '' 
+    createdAt: undefined,
+    status: 'active'
   });
-  
-  const [products, setProducts] = useState<any[]>([]);
+
+  const [products, setProducts] = useState<Product[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
 
-  const [editProduct, setEditProduct] = useState<any>(null); // 👈 Thêm state product đang edit
+  const [editProduct, setEditProduct] = useState<any>(null);
   const [editName, setEditName] = useState('');
   const [editPrice, setEditPrice] = useState('');
-
-  const fetchProducts = async () => {
-    try {
-      const response = await getListProducts();  
-      const activeProducts = response.filter((product: any) => product.status === 'active');
-      setProducts(activeProducts);
-    } catch (error) {
-      console.error('Failed to fetch products', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -46,7 +34,6 @@ const ProductList: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchProducts();
   };
 
   const handleDeleteClick = (id: string) => {
@@ -57,13 +44,14 @@ const ProductList: React.FC = () => {
   const handleConfirmDelete = async () => {
     if (!productToDelete) return;
     try {
-      const response = await deleteProduct(productToDelete);
+      const response = await productService.delete(productToDelete);
       if (response) {
         toast.success("Deleted successfully!");
-        fetchProducts();
+        const updatedProduct = products.filter(p => `${p._id}` !== `${productToDelete}`);
+        setProducts(updatedProduct);
       }
     } catch (error) {
-      toast.warning("Delete failed!");
+      toast.error(`${error}`);
     }
     setProductToDelete(null);
     setShowConfirmPopup(false);
@@ -77,7 +65,7 @@ const ProductList: React.FC = () => {
   // Khi bấm nút Edit
   const handleEditClick = (product: any) => {
     setEditProduct(product);
-    console.log("product",product)
+    console.log("product", product)
 
     setEditName(product.name || '');
     setEditPrice(product.price.toString());
@@ -91,20 +79,19 @@ const ProductList: React.FC = () => {
         name: editName,
         price: Number(editPrice),
       };
-      const response = await updateProduct(payload);
+      const response = await productService.update(payload);
       console.log('Update response:', response); // In ra phản hồi để kiểm tra
       if (response) {
         toast.success('Updated successfully!');
-        fetchProducts();
       } else {
         toast.error('Update failed!');
       }
     } catch (error) {
-      toast.error('Update failed!');
+      toast.error(`${error}`);
     }
     setEditProduct(null);
   };
-  
+
 
   const handleCancelEdit = () => {
     setEditProduct(null);
@@ -112,9 +99,22 @@ const ProductList: React.FC = () => {
 
   const totalPages = Math.ceil(products.length / itemsPerPage);
   const paginatedProducts = products.slice(
-    (currentPage - 1) * itemsPerPage, 
+    (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  useEffect(() => {
+    const getList = async () => {
+      try {
+        const response = await productService.getList(filters);
+        console.log('response', response)
+        response?.length && setProducts(response);
+      } catch (error) {
+        console.error('Failed to fetch products', error);
+      }
+    }
+    getList();
+  }, [filters]);
 
   return (
     <div className="bg-gray-100 font-sans">
@@ -162,7 +162,7 @@ const ProductList: React.FC = () => {
           onCancel={handleCancelEdit}
         />
       )}
-    </div>  
+    </div>
   );
 };
 

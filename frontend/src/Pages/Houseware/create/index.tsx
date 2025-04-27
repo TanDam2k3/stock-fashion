@@ -1,7 +1,7 @@
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { createStock } from "../../../api/api-stock";
+import { housewareService } from "../../../services";
 
 type Inputs = {
   name: string,
@@ -23,7 +23,7 @@ const CreateStock: React.FC = () => {
     }
 
     try {
-      const result = await createStock(data);
+      const result = await housewareService.create(data);
       if (result) {
         toast.success('Created successfully!');
         reset();
