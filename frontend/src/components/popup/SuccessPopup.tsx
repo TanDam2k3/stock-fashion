@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import loginImage from '../../assets/loadingGenerate.gif'
 
 interface SuccessPopupProps {
     message: string;
@@ -16,7 +17,7 @@ const SuccessPopup: React.FC<SuccessPopupProps> = ({ message, isOpen, onClose, r
             const timer = setTimeout(() => {
                 onClose();
                 navigate(redirectPath);
-            }, 5000);
+            }, 3000);
             return () => clearTimeout(timer);
         }
     }, [isOpen, onClose, navigate, redirectPath]);
@@ -30,7 +31,12 @@ const SuccessPopup: React.FC<SuccessPopupProps> = ({ message, isOpen, onClose, r
 
     return (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50 bg-black/50">
+            <div className="">
+             <img src={loginImage} alt="" />
+            </div>
+
             <div className="bg-green-500 text-white rounded-lg shadow-md p-4 flex items-center gap-3 max-w-sm animate-fadeIn">
+         
                 <svg
                     className="w-6 h-6"
                     fill="none"
