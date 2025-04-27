@@ -130,7 +130,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
           )}
 
           {menuItem(<FaCogs />, "Setting", "settings")}
-          {menuItem(<FaUserFriends />, "Nhân sự","employee")}
+          {menuItem(<FaUserFriends />, "Nhân sự", undefined, () =>
+  toggleDropdown("employee"), true, "employee"
+)}
+{openDropdown === "employee" && isOpen && (
+  <ul className="ml-8">
+    {dropdownItem("employees/create", "Tạo mới nhân sự")}
+    {dropdownItem("employees", "Quản lý nhân sự")}
+  </ul>
+)}
+
         </ul>
       </nav>
     </div>
