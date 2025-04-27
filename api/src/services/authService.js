@@ -14,16 +14,19 @@ const register = async (username, password, email) => {
       }),
       decryptPassword(password)
     ]);
-
+    console.log('existing', existing);
+    console.log('rawPassword', rawPassword);
     if (existing) return false;
 
     const hashed = await hashPassword(rawPassword);
+    console.log('hashed', hashed);
     const data = {
       username,
       password: hashed,
       email,
       status: 'active'
     };
+    console.log('data', data);
     const user = await userModel.create(data);
     return !!user;
   } catch (e) {
