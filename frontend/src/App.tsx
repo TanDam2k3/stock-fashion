@@ -11,6 +11,8 @@ import ProductList from "./Pages/ProductList";
 import ProtectedRoute from "./utils/auth/ProtectedRoute";
 import StockList from "./Pages/Stock";
 import CreateStock from './Pages/Stock/create'
+import Settings from "./Pages/Setting";
+import EmployeeManagement from "./Pages/ManageEmployee";
 
 const App = () => {
   return (
@@ -27,6 +29,10 @@ const App = () => {
 
             <Route path="stocks" element={<StockList />} />
             <Route path="stocks/create" element={<CreateStock />} />
+
+            <Route path="settings" element={<Settings />} />
+            <Route path="employee" element={<EmployeeManagement />} />
+
 
 
             <Route path="contact" element={<Contact />} />

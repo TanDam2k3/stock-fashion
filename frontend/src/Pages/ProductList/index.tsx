@@ -15,24 +15,24 @@ const ProductList: React.FC = () => {
   });
 
   const [products, setProducts] = useState<any[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<any[]>([]); // Danh sách sản phẩm đã lọc
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
 
-const [editProduct, setEditProduct] = useState<any>(null); 
-const [editName, setEditName] = useState('');
-const [editType, setEditType] = useState('');
-const [editQuantity, setEditQuantity] = useState('');
-const [editPrice, setEditPrice] = useState('');
+  const [editProduct, setEditProduct] = useState<any>(null); 
 
 
-  const fetchProducts = async () => {
+
+
+  const fetchProducts = async (filters = {}) => {
     try {
-      const response = await getListProducts();
+      const response = await getListProducts(filters); // Truyền filters vào API
       const activeProducts = response.filter((product: any) => product.status === 'active');
       setProducts(activeProducts);
+      setFilteredProducts(activeProducts); // Ban đầu, tất cả sản phẩm sẽ được lọc
     } catch (error) {
       console.error('Failed to fetch products', error);
     }
@@ -49,7 +49,7 @@ const [editPrice, setEditPrice] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchProducts();
+    fetchProducts(filters); // Gửi filters đi và lấy lại danh sách sản phẩm đã lọc
   };
 
   const handleDeleteClick = (id: string) => {
@@ -63,7 +63,7 @@ const [editPrice, setEditPrice] = useState('');
       const response = await deleteProduct(productToDelete);
       if (response) {
         toast.success('Deleted successfully!');
-        fetchProducts();
+        fetchProducts(); // Lấy lại danh sách sau khi xóa
       }
     } catch (error) {
       toast.warning('Delete failed!');
@@ -79,26 +79,19 @@ const [editPrice, setEditPrice] = useState('');
 
   const handleEditClick = (product: any) => {
     setEditProduct(product);
-    setEditName(product.name || '');
-    setEditType(product.type || '');
-    setEditQuantity(product.quantity?.toString() || '0');
-    setEditPrice(product.price?.toString() || '');
   };
-  
-  const handleSaveEdit = async () => {
+
+  const handleSaveEdit = async (updatedData: any) => {
     if (!editProduct) return;
     try {
       const payload = {
         _id: editProduct._id,
-        name: editName,
-        type: editType,
-        quantity: Number(editQuantity),
-        price: Number(editPrice),
+        ...updatedData,
       };
       const response = await updateProduct(payload);
       if (response) {
         toast.success('Updated successfully!');
-        fetchProducts();
+        fetchProducts(); // Lấy lại danh sách sau khi sửa
       } else {
         toast.error('Update failed!');
       }
@@ -107,14 +100,14 @@ const [editPrice, setEditPrice] = useState('');
     }
     setEditProduct(null);
   };
-  
 
   const handleCancelEdit = () => {
     setEditProduct(null);
   };
 
-  const totalPages = Math.ceil(products.length / itemsPerPage);
-  const paginatedProducts = products.slice(
+  // Logic phân trang
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const paginatedProducts = filteredProducts.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -148,28 +141,20 @@ const [editPrice, setEditPrice] = useState('');
         />
       )}
 
-{editProduct && (
-  <EditProductPopup
-    formData={{
-      name: editName,
-      type: editType,
-      quantity: Number(editQuantity),
-      price: Number(editPrice),
-    }}
-    onChange={(e) => {
-      const { name, value } = e.target;
-      if (name === 'name') setEditName(value);
-      else if (name === 'type') setEditType(value);
-      else if (name === 'quantity') setEditQuantity(value);
-      else if (name === 'price') setEditPrice(value);
-    }}
-    onSubmit={(e) => {
-      e.preventDefault();
-      handleSaveEdit();
-    }}
-    onCancel={handleCancelEdit}
-  />
-)}
+      {editProduct && (
+        <EditProductPopup
+          initialData={{
+            name: editProduct.name,
+            type: editProduct.type,
+            quantity: editProduct.quantity,
+            price: editProduct.price,
+          }}
+          onSubmit={(data) => {
+            handleSaveEdit(data);
+          }}
+          onCancel={handleCancelEdit}
+        />
+      )}
 
     </div>
   );

@@ -129,8 +129,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             </ul>
           )}
 
-          {menuItem(<FaCogs />, "Setting", "/settings")}
-          {menuItem(<FaUserFriends />, "Nhân sự", "/hr")}
+          {menuItem(<FaCogs />, "Setting", "settings")}
+          {menuItem(<FaUserFriends />, "Nhân sự","employee")}
         </ul>
       </nav>
     </div>
