@@ -1,34 +1,46 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import FilterForm from '../../components/listProduct/filter';
 import ProductTable from '../../components/listProduct/table-in-stock';
 import ConfirmDeletePopup from '../../components/popup/confirm-deleted-popup';
 import { toast } from 'react-toastify';
 import EditProductPopup from '../../components/listProduct/edit-popup-product';
-import { productService } from '../../services';
-import { Product, ProductSearchPayload } from '../../interfaces';
+import { housewareService, productService } from '../../services';
+import { Houseware, IUpadateProduct, Product, ProductSearchPayload } from '../../interfaces';
+import { AuthContext } from '../../contexts/AuthContext';
 
 const ProductList: React.FC = () => {
+  const { user } = useContext(AuthContext);
   const [filters, setFilters] = useState<ProductSearchPayload>({
     name: '',
     type: '',
     createdAt: undefined,
+    userId: user?._id,
     status: 'active'
   });
 
   const [products, setProducts] = useState<Product[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-
+  const [housewareOptions, setHousewareOptions] = useState<Houseware[]>([]);
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
 
-  const [editProduct, setEditProduct] = useState<any>(null);
+  const [editProduct, setEditProduct] = useState<IUpadateProduct>();
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFilters(prev => ({ ...prev, [name]: value }));
+    setFilters(prev => ({ ...prev, [name]: value, userId: user?._id }));
   };
+
+  const getList = async () => {
+    try {
+      const response = await productService.getList({ ...filters, userId: user?._id });
+      response?.length && setProducts(response);
+    } catch (error) {
+      console.error('Failed to fetch products', error);
+    }
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,11 +72,11 @@ const ProductList: React.FC = () => {
     setShowConfirmPopup(false);
   };
 
-  const handleEditClick = (product: any) => {
+  const handleEditClick = (product: IUpadateProduct) => {
     setEditProduct(product);
   };
 
-  const handleSaveEdit = async (updatedData: any) => {
+  const handleSaveEdit = async (updatedData: IUpadateProduct) => {
     if (!editProduct) return;
     try {
       const payload = {
@@ -72,20 +84,20 @@ const ProductList: React.FC = () => {
         ...updatedData,
       };
       const response = await productService.update(payload);
-      console.log('Update response:', response); // In ra phản hồi để kiểm tra
       if (response) {
         toast.success('Updated successfully!');
       } else {
         toast.error('Update failed!');
       }
+      getList();
     } catch (error) {
       toast.error(`${error}`);
     }
-    setEditProduct(null);
+    setEditProduct(undefined);
   };
 
   const handleCancelEdit = () => {
-    setEditProduct(null);
+    setEditProduct(undefined);
   };
 
   const totalPages = Math.ceil(products.length / itemsPerPage);
@@ -95,17 +107,22 @@ const ProductList: React.FC = () => {
   );
 
   useEffect(() => {
-    const getList = async () => {
+    const loadHousewareOptions = async () => {
       try {
-        const response = await productService.getList(filters);
-        console.log('response', response)
-        response?.length && setProducts(response);
+        const activeHousewares = await housewareService.getListHouseware({
+          status: 'active',
+          userId: user?._id
+        });
+        activeHousewares?.length && setHousewareOptions(activeHousewares);
       } catch (error) {
-        console.error('Failed to fetch products', error);
+        console.error("Failed to fetch houseware options:", error);
       }
-    }
-    getList();
-  }, [filters]);
+    };
+
+    user && loadHousewareOptions();
+    user && getList();
+  }, [filters, user]);
+
 
   return (
     <div className="bg-gray-100 font-sans">
@@ -122,7 +139,8 @@ const ProductList: React.FC = () => {
             totalPages={totalPages}
             onPageChange={setCurrentPage}
             onDelete={handleDeleteClick}
-            onEdit={handleEditClick} // 👈 Thêm onEdit
+            onEdit={handleEditClick}
+            housewareOptions={housewareOptions}
           />
         </div>
       </div>
@@ -139,11 +157,13 @@ const ProductList: React.FC = () => {
       {editProduct && (
         <EditProductPopup
           initialData={{
-            name: editProduct.name,
-            type: editProduct.type,
-            quantity: editProduct.quantity,
-            price: editProduct.price,
+            name: editProduct?.name ? editProduct.name : '',
+            type: editProduct?.type ? editProduct?.type : '',
+            quantity: editProduct?.quantity ? editProduct.quantity : 0,
+            price: editProduct?.price ? editProduct.price : 0,
+            housewareId: editProduct?.housewareId ? editProduct.housewareId : ''
           }}
+          housewareOptions={housewareOptions}
           onSubmit={(data) => {
             handleSaveEdit(data);
           }}

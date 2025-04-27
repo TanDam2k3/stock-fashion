@@ -53,7 +53,8 @@ class ProductService {
       ...(filters?.name && { name: filters.name }),
       ...(filters?.type && { type: filters.type }),
       ...(filters?.createdAt && { createdAt: filters.createdAt }),
-      ...(filters?.status && { status: filters.status })
+      ...(filters?.status && { status: filters.status }),
+      ...(filters?.userId && { userId: filters.userId })
     }
     try {
       const response = await axios.get(`${API_END_POINT}/api/products/list`, {
@@ -74,7 +75,7 @@ class ProductService {
   public async update(payload: ProductPayload) {
     try {
       const response = await axios.put(`${API_END_POINT}/api/products/update`,
-        { payload },
+        payload,
         {
           headers: {
             Authorization: `Bearer ${TOKEN}`,

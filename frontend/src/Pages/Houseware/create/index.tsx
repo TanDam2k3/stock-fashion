@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useContext } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { housewareService } from "../../../services";
+import { AuthContext } from "../../../contexts/AuthContext";
 
 type Inputs = {
   name: string,
@@ -15,6 +16,7 @@ const CreateStock: React.FC = () => {
     handleSubmit,
     reset
   } = useForm<Inputs>();
+  const { user } = useContext(AuthContext);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     if (!data.name || !data.city || !data.address) {
@@ -23,7 +25,11 @@ const CreateStock: React.FC = () => {
     }
 
     try {
-      const result = await housewareService.create(data);
+      const payload = {
+        ...data,
+        userId: user?._id
+      };
+      const result = await housewareService.create(payload);
       if (result) {
         toast.success('Created successfully!');
         reset();

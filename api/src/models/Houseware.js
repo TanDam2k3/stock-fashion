@@ -2,6 +2,9 @@ const mongoose = require('mongoose');
 
 const housewareSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId
+    },
     name: {
       type: String,
       default: ''

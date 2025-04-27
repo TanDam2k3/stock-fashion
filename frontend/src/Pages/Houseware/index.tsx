@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import StockFilter from '../../components/stock/filter';
 import StockTable from '../../components/stock/table';
@@ -6,12 +6,16 @@ import { housewareService } from '../../services/api-housewares';
 import ConfirmDeletePopup from '../../components/popup/confirm-deleted-popup';
 import EditStockPopup from '../../components/stock/edit-popup';
 import { Houseware } from '../../interfaces';
+import { AuthContext } from '../../contexts/AuthContext';
 
 const StockList: React.FC = () => {
+  const { user } = useContext(AuthContext);
   const [filters, setFilters] = useState({
     name: '',
     city: '',
-    createdAt: ''
+    createdAt: '',
+    userId: user?._id,
+    status: "active"
   });
 
   const [stocks, setStocks] = useState<Houseware[]>([]);
@@ -27,10 +31,7 @@ const StockList: React.FC = () => {
 
   const getListHouseware = async () => {
     try {
-      const stockList = await housewareService.getListHouseware({
-        status: "active"
-      });
-      console.log('stockList', stockList)
+      const stockList = await housewareService.getListHouseware({ ...filters, userId: user?._id });
       setStocks(stockList);
     } catch (error) {
       console.error('Error fetching stock list:', error);
@@ -39,7 +40,7 @@ const StockList: React.FC = () => {
 
   useEffect(() => {
     getListHouseware();
-  }, []);
+  }, [filters, user]);
 
   // DELETE
   const handleDeleteClick = (id: string) => {
@@ -103,7 +104,7 @@ const StockList: React.FC = () => {
   // FILTER
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
+    setFilters((prev) => ({ ...prev, [name]: value, userId: user?._id }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {

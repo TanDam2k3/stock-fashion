@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   FaHome,
@@ -7,6 +7,7 @@ import {
   FaCogs,
   FaChartLine,
 } from "react-icons/fa";
+import { TbLogout2 } from "react-icons/tb";
 import {
   MdArrowForwardIos,
   MdKeyboardArrowDown,
@@ -18,6 +19,7 @@ import {
 import { GiClothes } from "react-icons/gi";
 import { IoIosAddCircle } from "react-icons/io";
 import logo from "../../src/assets/logodha.svg"
+import { AuthContext } from "../contexts/AuthContext";
 interface SidebarProps {
   isOpen: boolean;
   toggleSidebar: () => void;
@@ -25,6 +27,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const { logout } = useContext(AuthContext);
 
   const toggleDropdown = (key: string) => {
     setOpenDropdown(prev => (prev === key ? null : key));
@@ -83,7 +86,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
       className={`fixed top-0 font-medium left-0 h-full bg-custom-sidebar text-white transform transition-all duration-300 ease-in-out ${isOpen ? "w-64" : "w-16"
         }`}
     >
-
       <div className="flex justify-end p-4">
         <button onClick={toggleSidebar} className="text-2xl text-white">
           {isOpen ? <IoArrowBackOutline /> : <IoArrowForwardOutline />}
@@ -92,9 +94,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
       <div className="flex justify-center items-center">
         <img src={logo} alt="Logo" className="w-[150px] h-[150px]" />
       </div>
-
-
-
 
       <nav className="mt-2">
         <ul>
@@ -113,11 +112,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 
           {menuItem(<GiClothes />, "Sản phẩm", "products")}
 
-
-
-
-
-
           {/* Phiếu báo cáo */}
           {menuItem(<FaChartLine />, "Lịch sử giao dịch", undefined, () =>
             toggleDropdown("report"), true, "report"
@@ -131,14 +125,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 
           {menuItem(<FaCogs />, "Setting", "settings")}
           {menuItem(<FaUserFriends />, "Nhân sự", undefined, () =>
-  toggleDropdown("employee"), true, "employee"
-)}
-{openDropdown === "employee" && isOpen && (
-  <ul className="ml-8">
-    {dropdownItem("employees/create", "Tạo mới nhân sự")}
-    {dropdownItem("employees", "Quản lý nhân sự")}
-  </ul>
-)}
+            toggleDropdown("employee"), true, "employee"
+          )}
+          {openDropdown === "employee" && isOpen && (
+            <ul className="ml-8">
+              {dropdownItem("employees/create", "Tạo mới nhân sự")}
+              {dropdownItem("employees", "Quản lý nhân sự")}
+            </ul>
+          )}
+          {menuItem(<TbLogout2 />, "Log out", "login", logout)}
 
         </ul>
       </nav>

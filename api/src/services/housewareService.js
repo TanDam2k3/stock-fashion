@@ -5,6 +5,7 @@ const create = async (payload) => {
   try {
     if (!payload) return null;
     const data = {
+      userId: payload?.userId,
       name: payload?.name || null,
       address: payload?.address || null,
       city: payload?.city || null,

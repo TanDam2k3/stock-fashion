@@ -1,5 +1,6 @@
 export interface ProductPayload {
     housewareId?: string;
+    userId?: string;
     name?: string;
     type?: string;
     quantity?: number;
@@ -10,6 +11,7 @@ export interface ProductPayload {
 }
 
 export interface ProductSearchPayload {
+    userId?: string;
     name?: string;
     type?: string;
     status?: string;
@@ -20,6 +22,26 @@ export interface ICreateProduct {
     _id?: string;
     housewareId?: string;
     housewareName?: string;
+    userId?: string;
+    fileId?: string;
+    name?: string;
+    type?: string;
+    quantity?: number;
+    status?: string,
+    price?: number;
+    imageUrl?: string;
+    file?: File | null,
+    imagePreview?: string | null;
+    updatedAt?: Date;
+    createdAt?: Date;
+    identification?: string;
+}
+
+export interface IUpadateProduct {
+    _id?: string;
+    housewareId?: string;
+    housewareName?: string;
+    userId?: string;
     fileId?: string;
     name?: string;
     type?: string;

@@ -8,6 +8,9 @@ const productSchema = new mongoose.Schema(
     fileId: {
       type: mongoose.Schema.Types.ObjectId
     },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId
+    },
     name: {
       type: String
     },

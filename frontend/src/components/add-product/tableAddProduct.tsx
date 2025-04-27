@@ -76,7 +76,6 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
         if (product.file) {
           file = await productService.uploadImage(product.file);
         }
-        console.log('file', file)
         await productService.create({
           housewareId: product.housewareId,
           name: product.name,
@@ -84,7 +83,8 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
           quantity: product.quantity,
           status: 'Active',
           price: product.price,
-          fileId: file?.file?._id || null
+          fileId: file?.file?._id || null,
+          userId: product?.userId
         });
 
         successCount++;

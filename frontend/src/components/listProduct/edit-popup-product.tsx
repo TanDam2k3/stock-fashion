@@ -1,8 +1,16 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import { Houseware } from "../../interfaces";
 
 interface EditProductPopupProps {
-  initialData: { name: string; type: string; quantity: number; price: number };
+  initialData: {
+    name: string;
+    type: string;
+    quantity: number;
+    price: number
+    housewareId: string;
+  };
+  housewareOptions: Houseware[];
   onSubmit: (data: { name: string; type: string; quantity: number; price: number }) => void;
   onCancel: () => void;
 }
@@ -11,10 +19,12 @@ const EditProductPopup: React.FC<EditProductPopupProps> = ({
   initialData,
   onSubmit,
   onCancel,
+  housewareOptions
 }) => {
   const { register, handleSubmit } = useForm({
     defaultValues: initialData,
   });
+
 
   const handleFormSubmit = (data: any) => {
     onSubmit(data);
@@ -27,7 +37,24 @@ const EditProductPopup: React.FC<EditProductPopupProps> = ({
           Chỉnh sửa sản phẩm
         </h3>
         <form onSubmit={handleSubmit(handleFormSubmit)}>
-          {/* Tên sản phẩm */}
+          <div className="mb-4">
+            <label htmlFor="housewareId" className="block text-sm font-medium text-gray-700">Houseware</label>
+            <select
+              id="housewareId"
+              className="w-full rounded-md border border-gray-200 bg-white px-4 py-2 text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#0a162c] focus:border-transparent"
+              {...register("housewareId", { required: true })}
+            >
+              <option value="" disabled>
+                Select houseware
+              </option>
+              {housewareOptions.map((option) => (
+                <option key={option._id} value={option._id}>
+                  {option.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className="mb-4">
             <label className="block text-sm font-semibold text-gray-700">
               Tên sản phẩm
@@ -39,19 +66,22 @@ const EditProductPopup: React.FC<EditProductPopupProps> = ({
             />
           </div>
 
-          {/* Loại sản phẩm */}
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-700">
-              Loại sản phẩm
-            </label>
-            <input
-              type="text"
+            <label htmlFor="type" className="block text-sm font-medium text-gray-700">Loại sản phẩm</label>
+            <select
+              id="type"
+              className="w-full rounded-md border border-gray-200 bg-white px-4 py-2 text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#0a162c] focus:border-transparent"
               {...register("type", { required: true })}
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
+            >
+              <option value="" disabled>
+                Select type
+              </option>
+              <option>Áo</option>
+              <option>Áo khoác</option>
+              <option>Quần</option>
+            </select>
           </div>
 
-          {/* Số lượng */}
           <div className="mb-4">
             <label className="block text-sm font-semibold text-gray-700">
               Số lượng
@@ -63,8 +93,7 @@ const EditProductPopup: React.FC<EditProductPopupProps> = ({
             />
           </div>
 
-          {/* Giá */}
-          <div className="mb-6">
+          <div className="mb-4">
             <label className="block text-sm font-semibold text-gray-700">
               Giá sản phẩm
             </label>
@@ -75,7 +104,6 @@ const EditProductPopup: React.FC<EditProductPopupProps> = ({
             />
           </div>
 
-          {/* Buttons */}
           <div className="flex justify-between gap-4">
             <button
               type="button"

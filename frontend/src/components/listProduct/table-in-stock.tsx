@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaSort, FaEdit, FaTrashAlt } from 'react-icons/fa';
-import { Product } from '../../interfaces';
+import { Houseware, Product } from '../../interfaces';
 
 interface TableProps {
   products: Product[];
@@ -9,9 +9,10 @@ interface TableProps {
   onPageChange: (page: number) => void;
   onDelete: (id: string) => void;
   onEdit: (product: Product) => void;
+  housewareOptions: Houseware[];
 }
 
-const ProductTable: React.FC<TableProps> = ({ products, currentPage, totalPages, onPageChange, onDelete, onEdit }) => {
+const ProductTable: React.FC<TableProps> = ({ products, currentPage, totalPages, onPageChange, onDelete, onEdit, housewareOptions }) => {
 
   return (
     <>
@@ -25,14 +26,13 @@ const ProductTable: React.FC<TableProps> = ({ products, currentPage, totalPages,
               <th className="py-3 text-left cursor-pointer">Loại hàng hóa</th>
               <th className="py-3 text-left">Số lượng</th>
               <th className="py-3 text-left">Giá</th>
-              <th className="py-3 text-left">Trạng thái</th>
               <th className="pr-6 py-3 text-left">Action</th>
             </tr>
           </thead>
           <tbody>
             {products.map((product, index) => (
               <tr key={product._id} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} border border-gray-200 rounded-md`}>
-                <td className="pl-6 py-4">{product.name || 'Chưa có tên'}</td>
+                <td className="pl-6 py-4">{(housewareOptions.find(h => `${h?._id}` === `${product?.housewareId}`))?.name || ''}</td>
                 <td className="py-4">
                   <img src={product.imageUrl} alt={product.name || 'No Image'} className="w-10 h-10 rounded-full object-cover" />
                 </td>
@@ -40,10 +40,9 @@ const ProductTable: React.FC<TableProps> = ({ products, currentPage, totalPages,
                 <td className="py-4">{product.type}</td>
                 <td className="py-4">{product.quantity}</td>
                 <td className="py-4">{product?.price ? product.price.toLocaleString() : 0} VND</td>
-                <td className="py-4">{product.status}</td>
                 <td className="pr-6 py-4 space-x-3">
                   <button
-                    onClick={() => onEdit(product)} // 👈 gọi onEdit khi bấm Edit
+                    onClick={() => onEdit(product)}
                     className="text-green-500 hover:scale-125"
                   >
                     <FaEdit size={20} />

@@ -2,19 +2,12 @@
 import axios from 'axios';
 import { API_END_POINT } from '../config';
 import Cookies from 'js-cookie';
-import { Houseware } from '../interfaces';
-
-interface StockPayload {
-  name?: string;
-  city?: string;
-  address?: string;
-  status?: string;
-}
+import { Houseware, HousewarePayload } from '../interfaces';
 
 const TOKEN = Cookies.get('token') || null;
 
 class HousewareService {
-  public async create(payload: StockPayload) {
+  public async create(payload: HousewarePayload) {
     try {
       const response = await axios.post(
         `${API_END_POINT}/api/houseware/create`,
@@ -32,8 +25,15 @@ class HousewareService {
     }
   };
 
-  public async getListHouseware(payload: StockPayload) {
+  public async getListHouseware(filter: HousewarePayload) {
     try {
+      const payload = {
+        ...(filter?.userId && { userId: filter.userId }),
+        ...(filter?.name && { name: filter.name }),
+        ...(filter?.city && { city: filter.city }),
+        ...(filter?.address && { address: filter.address }),
+        ...(filter?.status && { status: filter.status })
+      }
       const response = await axios.get(
         `${API_END_POINT}/api/houseware/list`,
         {

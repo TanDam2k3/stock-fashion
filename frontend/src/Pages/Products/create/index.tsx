@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import ProductsTable from "../../../components/add-product/tableAddProduct";
 import { housewareService } from "../../../services";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { ICreateProduct, Houseware } from "../../../interfaces";
+import { AuthContext } from "../../../contexts/AuthContext";
 
 type Inputs = {
   housewareId: string,
@@ -15,6 +16,7 @@ type Inputs = {
 }
 
 const CreateProduct: React.FC = () => {
+  const { user } = useContext(AuthContext);
   const {
     register,
     handleSubmit,
@@ -35,7 +37,8 @@ const CreateProduct: React.FC = () => {
     const loadHousewareOptions = async () => {
       try {
         const activeHousewares = await housewareService.getListHouseware({
-          status: 'active'
+          status: 'active',
+          userId: user?._id
         });
         activeHousewares?.length && setHousewareOptions(activeHousewares);
       } catch (error) {
@@ -43,8 +46,8 @@ const CreateProduct: React.FC = () => {
       }
     };
 
-    loadHousewareOptions();
-  }, []);
+    user && loadHousewareOptions();
+  }, [user]);
 
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
@@ -58,6 +61,7 @@ const CreateProduct: React.FC = () => {
     const newProduct: ICreateProduct = {
       housewareId: data?.housewareId,
       housewareName: houseware?.name,
+      userId: user?._id,
       name: data?.name,
       type: data?.type,
       quantity: data?.quantity,
@@ -66,6 +70,8 @@ const CreateProduct: React.FC = () => {
       file: data?.file?.[0] || null,
       identification: `${Date.now()}`
     };
+
+    console.log('newProduct', newProduct)
 
     newProduct && setProducts([...products, newProduct]);
     reset();
@@ -81,7 +87,8 @@ const CreateProduct: React.FC = () => {
         return {
           ...updatedProduct,
           housewareName: houseware?.name,
-          imagePreview
+          imagePreview,
+          userId: user?._id
         }
       };
       return p;

@@ -15,7 +15,8 @@ const create = async (payload) => {
       quantity: payload?.quantity || 0,
       status: 'active',
       fileId: isValidObjectId(payload?.fileId) ? new ObjectId(payload.fileId) : null,
-      price: payload?.price || 0
+      price: payload?.price || 0,
+      userId: isValidObjectId(payload?.userId) ? new ObjectId(payload.userId) : null
     };
 
     const product = await productModel.create(data);
@@ -67,7 +68,7 @@ const updatedProduct = async (payload) => {
   try {
     const updated = await productModel.findOneAndUpdate(
       {
-        _id: payload._id
+        _id: new ObjectId(payload._id)
       },
       {
         $set: {

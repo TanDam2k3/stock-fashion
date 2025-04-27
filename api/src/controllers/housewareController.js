@@ -43,7 +43,6 @@ exports.deleted = async (req, res) => {
 
 exports.getList = async (req, res) => {
   try {
-    console.log('req?.query', req?.query);
     const housewares = await housewareService.getList(req?.query);
     res.status(200).json({
       data: housewares

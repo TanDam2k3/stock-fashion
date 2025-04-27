@@ -1,11 +1,14 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import CryptoJS from 'crypto-js';
 import Cookies from 'js-cookie';
 import SuccessPopup from '../../components/popup/SuccessPopup';
 import { API_END_POINT, ENCRYPT_KEY } from "../../config";
+import { AuthContext } from "../../contexts/AuthContext";
+import { jwtDecode } from "jwt-decode";
+import { IUser } from "../../interfaces";
 
 type Inputs = {
   username: string;
@@ -13,6 +16,7 @@ type Inputs = {
 }
 
 const Login: React.FC = () => {
+  const { setUser, setToken } = useContext(AuthContext);
   const [remember, setRemember] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const navigate = useNavigate();
@@ -40,6 +44,9 @@ const Login: React.FC = () => {
           expires: remember ? 7 : undefined,
           sameSite: 'Strict'
         });
+        setToken(token);
+        const decoded = jwtDecode<IUser>(token);
+        setUser(decoded);
 
         setShowPopup(true);
       } else {
