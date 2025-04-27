@@ -11,6 +11,8 @@ import Products from "./Pages/Products";
 import ProtectedRoute from "./utils/auth/ProtectedRoute";
 import Housewares from "./Pages/Houseware";
 import CreateStock from './Pages/Houseware/create'
+import Settings from "./Pages/Setting";
+import EmployeeManagement from "./Pages/ManageEmployee";
 
 const App = () => {
   return (
@@ -28,6 +30,11 @@ const App = () => {
 
             <Route path="stocks" element={<Housewares />} />
             <Route path="stocks/create" element={<CreateStock />} />
+
+            <Route path="settings" element={<Settings />} />
+            <Route path="employee" element={<EmployeeManagement />} />
+
+
 
             <Route path="contact" element={<Contact />} />
           </Route>

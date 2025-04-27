@@ -24,8 +24,6 @@ const ProductList: React.FC = () => {
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
 
   const [editProduct, setEditProduct] = useState<any>(null);
-  const [editName, setEditName] = useState('');
-  const [editPrice, setEditPrice] = useState('');
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -62,22 +60,16 @@ const ProductList: React.FC = () => {
     setShowConfirmPopup(false);
   };
 
-  // Khi bấm nút Edit
   const handleEditClick = (product: any) => {
     setEditProduct(product);
-    console.log("product", product)
-
-    setEditName(product.name || '');
-    setEditPrice(product.price.toString());
   };
 
-  const handleSaveEdit = async () => {
+  const handleSaveEdit = async (updatedData: any) => {
     if (!editProduct) return;
     try {
       const payload = {
         _id: editProduct._id,
-        name: editName,
-        price: Number(editPrice),
+        ...updatedData,
       };
       const response = await productService.update(payload);
       console.log('Update response:', response); // In ra phản hồi để kiểm tra
@@ -91,7 +83,6 @@ const ProductList: React.FC = () => {
     }
     setEditProduct(null);
   };
-
 
   const handleCancelEdit = () => {
     setEditProduct(null);
@@ -146,18 +137,15 @@ const ProductList: React.FC = () => {
       )}
 
       {editProduct && (
-        <EditProductPopup // 👈 Sử dụng EditProductPopup
-          formData={{ name: editName, price: Number(editPrice) }}
-          onChange={(e) => {
-            if (e.target.name === 'name') {
-              setEditName(e.target.value);
-            } else if (e.target.name === 'price') {
-              setEditPrice(e.target.value);
-            }
+        <EditProductPopup
+          initialData={{
+            name: editProduct.name,
+            type: editProduct.type,
+            quantity: editProduct.quantity,
+            price: editProduct.price,
           }}
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSaveEdit();
+          onSubmit={(data) => {
+            handleSaveEdit(data);
           }}
           onCancel={handleCancelEdit}
         />
