@@ -209,7 +209,7 @@ const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   <EditEmployeePopup
     employee={editingEmployee}
     onClose={() => setShowEditPopup(false)}
-    onSave={(updatedEmployee) => {
+    onSave={() => {
       setShowEditPopup(false);
     }}
   />
