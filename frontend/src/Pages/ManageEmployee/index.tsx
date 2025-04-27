@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ConfirmDeletePopup from '../../components/popup/confirm-deleted-popup';
 import EmployeeFilter from '../../components/manage-employees/filter';
+import EditEmployeePopup from '../../components/manage-employees/edit-employees';
 
 interface Employee {
   id: string;
@@ -19,6 +20,9 @@ const EmployeeTable: React.FC = () => {
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('');
+  const [showEditPopup, setShowEditPopup] = useState<boolean>(false);
+const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+
 
 
   const employees: Employee[] = [
@@ -59,7 +63,11 @@ const EmployeeTable: React.FC = () => {
     setSelectedEmployeeId(employeeId);
     setShowConfirmPopup(true);
   };
-
+  const handleEdit = (employee: Employee) => {
+    setEditingEmployee(employee);
+    setShowEditPopup(true);
+  };
+  
   const confirmDelete = () => {
     if (selectedEmployeeId) {
       console.log('Xóa nhân viên có ID:', selectedEmployeeId);
@@ -155,17 +163,21 @@ const EmployeeTable: React.FC = () => {
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex space-x-2">
                     {/* Nút Update */}
-                    <button className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md transition-colors flex items-center">
-                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                        />
-                      </svg>
-                      Sửa
-                    </button>
+                    <button
+  onClick={() => handleEdit(employee)}
+  className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md transition-colors flex items-center"
+>
+  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+    />
+  </svg>
+  Sửa
+</button>
+
 
                     {/* Nút Delete */}
                     <button
@@ -193,6 +205,16 @@ const EmployeeTable: React.FC = () => {
       {showConfirmPopup && (
         <ConfirmDeletePopup onConfirm={confirmDelete} onCancel={() => setShowConfirmPopup(false)} />
       )}
+      {showEditPopup && editingEmployee && (
+  <EditEmployeePopup
+    employee={editingEmployee}
+    onClose={() => setShowEditPopup(false)}
+    onSave={(updatedEmployee) => {
+      setShowEditPopup(false);
+    }}
+  />
+)}
+
     </div>
   );
 };

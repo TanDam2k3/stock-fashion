@@ -13,6 +13,7 @@ import Housewares from "./Pages/Houseware";
 import CreateStock from './Pages/Houseware/create'
 import Settings from "./Pages/Setting";
 import EmployeeManagement from "./Pages/ManageEmployee";
+import CreateEmployee from "./Pages/ManageEmployee/create";
 
 const App = () => {
   return (
@@ -32,7 +33,8 @@ const App = () => {
             <Route path="stocks/create" element={<CreateStock />} />
 
             <Route path="settings" element={<Settings />} />
-            <Route path="employee" element={<EmployeeManagement />} />
+            <Route path="employees" element={<EmployeeManagement />} />
+            <Route path="employees/create" element={<CreateEmployee />} />
 
 
 
