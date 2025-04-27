@@ -39,7 +39,7 @@ export const uploadImage = async (file: File) => {
   formData.append('file', file); // field name phải đúng là 'file'
 
   try {
-    const response = await axios.post('/api/files/upload', formData, {
+    const response = await axios.post(`${API_END_POINT}/api/files/upload`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
