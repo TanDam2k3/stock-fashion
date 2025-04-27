@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import FilterForm from '../../components/listProduct/filter';
 import ProductTable from '../../components/listProduct/table-in-stock';
 import ConfirmDeletePopup from '../../components/popup/confirm-deleted-popup';
-import { getListProducts, deleteProduct, updateProduct } from '../../api/api-product'; 
+import { getListProducts, deleteProduct, updateProduct } from '../../api/api-product';
 import { toast } from 'react-toastify';
 import EditProductPopup from '../../components/listProduct/edit-popup-product';
 
@@ -11,9 +11,9 @@ const ProductList: React.FC = () => {
     name: '',
     type: '',
     createdAt: '',
-    city: '' 
+    city: ''
   });
-  
+
   const [products, setProducts] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -21,13 +21,16 @@ const ProductList: React.FC = () => {
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
 
-  const [editProduct, setEditProduct] = useState<any>(null); // 👈 Thêm state product đang edit
-  const [editName, setEditName] = useState('');
-  const [editPrice, setEditPrice] = useState('');
+const [editProduct, setEditProduct] = useState<any>(null); 
+const [editName, setEditName] = useState('');
+const [editType, setEditType] = useState('');
+const [editQuantity, setEditQuantity] = useState('');
+const [editPrice, setEditPrice] = useState('');
+
 
   const fetchProducts = async () => {
     try {
-      const response = await getListProducts();  
+      const response = await getListProducts();
       const activeProducts = response.filter((product: any) => product.status === 'active');
       setProducts(activeProducts);
     } catch (error) {
@@ -59,11 +62,11 @@ const ProductList: React.FC = () => {
     try {
       const response = await deleteProduct(productToDelete);
       if (response) {
-        toast.success("Deleted successfully!");
+        toast.success('Deleted successfully!');
         fetchProducts();
       }
     } catch (error) {
-      toast.warning("Delete failed!");
+      toast.warning('Delete failed!');
     }
     setProductToDelete(null);
     setShowConfirmPopup(false);
@@ -74,25 +77,25 @@ const ProductList: React.FC = () => {
     setShowConfirmPopup(false);
   };
 
-  // Khi bấm nút Edit
   const handleEditClick = (product: any) => {
     setEditProduct(product);
-    console.log("product",product)
-
     setEditName(product.name || '');
-    setEditPrice(product.price.toString());
+    setEditType(product.type || '');
+    setEditQuantity(product.quantity?.toString() || '0');
+    setEditPrice(product.price?.toString() || '');
   };
-
+  
   const handleSaveEdit = async () => {
     if (!editProduct) return;
     try {
       const payload = {
         _id: editProduct._id,
         name: editName,
+        type: editType,
+        quantity: Number(editQuantity),
         price: Number(editPrice),
       };
       const response = await updateProduct(payload);
-      console.log('Update response:', response); // In ra phản hồi để kiểm tra
       if (response) {
         toast.success('Updated successfully!');
         fetchProducts();
@@ -112,7 +115,7 @@ const ProductList: React.FC = () => {
 
   const totalPages = Math.ceil(products.length / itemsPerPage);
   const paginatedProducts = products.slice(
-    (currentPage - 1) * itemsPerPage, 
+    (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
@@ -145,24 +148,30 @@ const ProductList: React.FC = () => {
         />
       )}
 
-      {editProduct && (
-        <EditProductPopup // 👈 Sử dụng EditProductPopup
-          formData={{ name: editName, price: Number(editPrice) }}
-          onChange={(e) => {
-            if (e.target.name === 'name') {
-              setEditName(e.target.value);
-            } else if (e.target.name === 'price') {
-              setEditPrice(e.target.value);
-            }
-          }}
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSaveEdit();
-          }}
-          onCancel={handleCancelEdit}
-        />
-      )}
-    </div>  
+{editProduct && (
+  <EditProductPopup
+    formData={{
+      name: editName,
+      type: editType,
+      quantity: Number(editQuantity),
+      price: Number(editPrice),
+    }}
+    onChange={(e) => {
+      const { name, value } = e.target;
+      if (name === 'name') setEditName(value);
+      else if (name === 'type') setEditType(value);
+      else if (name === 'quantity') setEditQuantity(value);
+      else if (name === 'price') setEditPrice(value);
+    }}
+    onSubmit={(e) => {
+      e.preventDefault();
+      handleSaveEdit();
+    }}
+    onCancel={handleCancelEdit}
+  />
+)}
+
+    </div>
   );
 };
 

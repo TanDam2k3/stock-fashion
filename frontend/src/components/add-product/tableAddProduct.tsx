@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { createProduct, uploadImage } from "../../api/api-product";
 import { toast } from "react-toastify";
-import { MdUploadFile } from "react-icons/md";
 
 interface Product {
   id: string;
@@ -14,15 +13,7 @@ interface Product {
   imagePreview?: string;
   housewareStockId: string;
 }
-interface Stock {
-  _id: string;
-  name: string;
-  city: string;
-  address: string;
-  createdAt: string;
-  updatedAt: string;
-  status: string;
-}interface ProductsTableProps {
+interface ProductsTableProps {
   products: Product[];
   onUpdateProduct: (updatedProduct: Product) => void;
   onDeleteProduct: (productId: string) => void;
@@ -67,6 +58,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
   
             const uploadRes = await uploadImage(file);
             fileId = uploadRes.file._id; 
+            console.log("fileId",fileId)
           }
   
           await createProduct({

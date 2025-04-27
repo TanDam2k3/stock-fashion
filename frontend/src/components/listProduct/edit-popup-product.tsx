@@ -1,11 +1,12 @@
 import React from "react";
 
 interface EditProductPopupProps {
-  formData: { name: string; price: number };
+  formData: { name: string; type: string; quantity: number; price: number };
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
 }
+
 
 const EditProductPopup: React.FC<EditProductPopupProps> = ({
   formData,
@@ -20,51 +21,86 @@ const EditProductPopup: React.FC<EditProductPopupProps> = ({
           Chỉnh sửa sản phẩm
         </h3>
         <form onSubmit={onSubmit}>
-          <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-700">
-              Tên sản phẩm
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={onChange}
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-              required
-            />
-          </div>
+  {/* Tên sản phẩm */}
+  <div className="mb-4">
+    <label className="block text-sm font-semibold text-gray-700">
+      Tên sản phẩm
+    </label>
+    <input
+      type="text"
+      name="name"
+      value={formData.name}
+      onChange={onChange}
+      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+      required
+    />
+  </div>
 
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-700">
-              Giá sản phẩm
-            </label>
-            <input
-              type="number"
-              name="price"
-              value={formData.price}
-              onChange={onChange}
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-              required
-              min={0}
-            />
-          </div>
+  {/* Loại sản phẩm */}
+  <div className="mb-4">
+    <label className="block text-sm font-semibold text-gray-700">
+      Loại sản phẩm
+    </label>
+    <input
+      type="text"
+      name="type"
+      value={formData.type}
+      onChange={onChange}
+      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+      required
+    />
+  </div>
 
-          <div className="flex justify-between gap-4">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="w-full py-2 bg-gray-300 text-gray-800 rounded-md text-sm font-semibold transition hover:bg-gray-400"
-            >
-              Hủy
-            </button>
-            <button
-              type="submit"
-              className="w-full py-2 bg-purple-600 text-white rounded-md text-sm font-semibold transition hover:bg-purple-700"
-            >
-              Lưu thay đổi
-            </button>
-          </div>
-        </form>
+  {/* Số lượng */}
+  <div className="mb-4">
+    <label className="block text-sm font-semibold text-gray-700">
+      Số lượng
+    </label>
+    <input
+      type="number"
+      name="quantity"
+      value={formData.quantity}
+      onChange={onChange}
+      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+      required
+      min={0}
+    />
+  </div>
+
+  {/* Giá */}
+  <div className="mb-6">
+    <label className="block text-sm font-semibold text-gray-700">
+      Giá sản phẩm
+    </label>
+    <input
+      type="number"
+      name="price"
+      value={formData.price}
+      onChange={onChange}
+      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+      required
+      min={0}
+    />
+  </div>
+
+  {/* Buttons */}
+  <div className="flex justify-between gap-4">
+    <button
+      type="button"
+      onClick={onCancel}
+      className="w-full py-2 bg-gray-300 text-gray-800 rounded-md text-sm font-semibold transition hover:bg-gray-400"
+    >
+      Hủy
+    </button>
+    <button
+      type="submit"
+      className="w-full py-2 bg-purple-600 text-white rounded-md text-sm font-semibold transition hover:bg-purple-700"
+    >
+      Lưu thay đổi
+    </button>
+  </div>
+</form>
+
       </div>
     </div>
   );
