@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import ProductsTable from "../../../components/add-product/tableAddProduct";
 import { housewareService } from "../../../services";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -16,10 +16,16 @@ type Inputs = {
 }
 
 const CreateProduct: React.FC = () => {
+const types = ["Áo", "Áo khoác", "Quần", "Đầm", "Váy", "Chân váy", "Áo sơ mi", 
+  "Áo len", "Áo thun", "Áo dài", "Bộ đồ", "Vest", "Áo hoodie", "Áo tanktop", "Áo croptop"];
+
+  
   const { user } = useContext(AuthContext);
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     reset
   } = useForm<Inputs>({
     defaultValues: {
@@ -32,6 +38,32 @@ const CreateProduct: React.FC = () => {
 
   const [housewareOptions, setHousewareOptions] = useState<Houseware[]>([]);
   const [products, setProducts] = useState<ICreateProduct[]>([]);
+const [showDropdown, setShowDropdown] = useState(false);
+const [visibleType, setVisibleType] = useState<string[]>([]);
+ const [typePage, setTypePage] = useState(1);
+const dropdownRef = useRef<HTMLDivElement>(null);
+const typeInput = watch("type");
+
+const typePerPage = 5;
+const loadMoreType = () => {
+  const nextCities = types.slice(0, (typePage + 1) * typePerPage);
+  setVisibleType(nextCities);
+  setTypePage(prev => prev + 1);
+};
+const handleScroll = () => {
+  if (!dropdownRef.current) return;
+  const { scrollTop, scrollHeight, clientHeight } = dropdownRef.current;
+  if (scrollTop + clientHeight >= scrollHeight - 10) {
+    loadMoreType();
+  }
+};
+
+  useEffect(() => {
+    if (showDropdown) {
+      setVisibleType(types.slice(0, typePerPage));
+      setTypePage(1);
+    }
+  }, [showDropdown]);
 
   useEffect(() => {
     const loadHousewareOptions = async () => {
@@ -159,25 +191,37 @@ const CreateProduct: React.FC = () => {
               />
             </div>
 
-            <div>
-              <label
-                htmlFor="type"
-                className="block text-sm font-semibold text-black mb-1"
-              >
-                Type
-              </label>
-              <select
+            <div className="relative">
+              <label htmlFor="city" className="block text-sm font-semibold text-black mb-1">City</label>
+              <input
                 id="type"
-                className="w-full rounded-md border border-gray-200 bg-white px-4 py-2 text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#0a162c] focus:border-transparent"
-                {...register("type", { required: true })}
-              >
-                <option value="" disabled>
-                  Select type
-                </option>
-                <option>Áo</option>
-                <option>Áo khoác</option>
-                <option>Quần</option>
-              </select>
+                type="text"
+                placeholder="Select a type"
+                className="w-full rounded-md border px-4 py-2"
+                onFocus={() => setShowDropdown(true)}
+                value={typeInput}
+                readOnly
+              />
+              {showDropdown && (
+                <div
+                  ref={dropdownRef}
+                  onScroll={handleScroll}
+                  className="absolute mt-1 max-h-48 w-full overflow-y-auto rounded-md border bg-white shadow-lg z-10"
+                >
+                  {visibleType.map((item) => (
+                    <div
+                      key={item}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => {
+                        setValue("type", item);
+                        setShowDropdown(false);
+                      }}
+                    >
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div>
