@@ -2,6 +2,7 @@ import { createContext, useState, useEffect, ReactNode } from "react";
 import { jwtDecode } from "jwt-decode";
 import Cookies from 'js-cookie';
 import { IUser } from "../interfaces";
+import { userService } from "../services";
 
 interface AuthContextType {
     user: IUser | null;
@@ -28,23 +29,34 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const [token, setToken] = useState<string | null>(null);
 
     useEffect(() => {
-        const savedToken = Cookies.get('token');
-        if (savedToken) {
-            setToken(savedToken);
-            const decoded = jwtDecode<IUser>(savedToken);
-            setUser(decoded);
-        }
+        const authContext = async () => {
+            const savedToken = Cookies.get('token');
+            if (savedToken) {
+                setToken(savedToken);
+                const decoded = jwtDecode<IUser>(savedToken);
+                const user = await userService.findDetail(decoded._id);
+                const userDetil = {
+                    ...decoded,
+                    ...user
+                }
+                setUser(userDetil);
+                setUser(decoded);
+            }
+        };
+        authContext();
     }, []);
 
     const logout = () => {
+        const confirm = window.confirm('Bạn có muốn đăng xuất không?');
+        if (!confirm) return;
         setToken(null);
         setUser(null);
         document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+        window.location.reload();
     };
 
     return (
-        <AuthContext.Provider value={{ user, setUser, token, setToken, logout }
-        }>
+        <AuthContext.Provider value={{ user, setUser, token, setToken, logout }}>
             {children}
         </AuthContext.Provider>
     );

@@ -9,6 +9,7 @@ import { API_END_POINT, ENCRYPT_KEY } from "../../config";
 import { AuthContext } from "../../contexts/AuthContext";
 import { jwtDecode } from "jwt-decode";
 import { IUser } from "../../interfaces";
+import { userService } from "../../services";
 
 type Inputs = {
   username: string;
@@ -46,7 +47,12 @@ const Login: React.FC = () => {
         });
         setToken(token);
         const decoded = jwtDecode<IUser>(token);
-        setUser(decoded);
+        const user = await userService.findDetail(decoded._id);
+        const userDetil = {
+          ...decoded,
+          ...user
+        }
+        setUser(userDetil);
 
         setShowPopup(true);
       } else {

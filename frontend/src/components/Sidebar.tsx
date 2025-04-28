@@ -83,32 +83,31 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   );
 
   return (
-<div
-  className={`fixed top-0 font-medium left-0 h-full bg-custom-sidebar text-white transform transition-all duration-300 ease-in-out ${
-    isOpen ? "w-64" : "w-16"
-  }`}
-  style={{
-    overflowY: 'hidden',
-    scrollbarWidth: 'none', 
-    msOverflowStyle: 'none', 
-    scrollBehavior: 'smooth', 
-    transition: 'overflow-y 0.5s ease-in-out', 
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.overflowY = 'auto';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.overflowY = 'hidden';
-  }}
->
+    <div
+      className={`fixed top-0 font-medium left-0 h-full bg-custom-sidebar text-white transform transition-all duration-300 ease-in-out ${isOpen ? "w-64" : "w-16"
+        }`}
+      style={{
+        overflowY: 'hidden',
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none',
+        scrollBehavior: 'smooth',
+        transition: 'overflow-y 0.5s ease-in-out',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.overflowY = 'auto';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.overflowY = 'hidden';
+      }}
+    >
 
-<style>{`
+      <style>{`
     .sidebar-container::-webkit-scrollbar {
       display: none;
     }
   `}</style>
 
-  
+
       <div className="flex justify-end p-4">
         <button onClick={toggleSidebar} className="text-2xl text-white">
           {isOpen ? <IoArrowBackOutline /> : <IoArrowForwardOutline />}
@@ -134,8 +133,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
           {menuItem(<FaBoxes />, "Kho hàng", "stocks")}
 
           {menuItem(<GiClothes />, "Sản phẩm", "products")}
-          {menuItem(<FaFileExport/>, "Nhập kho", "import")}
-          {menuItem(<FaFileExport   />, "Xuất kho", "export")}
+          {menuItem(<FaFileExport />, "Nhập kho", "import")}
+          {menuItem(<FaFileExport />, "Xuất kho", "export")}
 
           {/* Phiếu báo cáo */}
           {menuItem(<FaChartLine />, "Lịch sử giao dịch", undefined, () =>
@@ -148,7 +147,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             </ul>
           )}
 
-          {menuItem(<FaCogs />, "Setting", "settings")}
+          {user && user.role !== 'admin' && (
+            <>
+              {menuItem(<FaCogs />, "Setting", "settings")}
+
+            </>
+          )}
+
           {user && user.role === 'admin' && (
             <>
               {menuItem(<FaUserFriends />, "Nhân sự", undefined, () =>
