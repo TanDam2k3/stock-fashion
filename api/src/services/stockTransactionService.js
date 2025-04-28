@@ -54,8 +54,8 @@ const getTransactions = async (query) => {
     const productIds = data.map((d) => d?.productId);
     const housewareIds = data.map((d) => d?.housewareId);
     const [products, housewares, user] = await Promise.all([
-      productService.getList({ _id: { $in: productIds } }),
-      housewareService.getList({ _id: { $in: housewareIds } }),
+      productService.getList({ _id: { $in: productIds }, userId: query.userId }),
+      housewareService.getList({ _id: { $in: housewareIds }, userId: query.userId }),
       userService.getDetail({ _id: data[0].userId })
     ]);
     const dataResponse = data.map((d) => {

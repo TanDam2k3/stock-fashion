@@ -94,24 +94,6 @@ const ImportStock: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Left: Form */}
           <div className="flex flex-col gap-6 justify-center">
-          <div>
-              <label htmlFor="stockId" className="block text-sm font-semibold text-black mb-1">
-                Select Product
-              </label>
-              <select
-                id="productId"
-                className="w-full rounded-md border px-4 py-2"
-                {...register("productId", { required: true })}
-              >
-                <option value="">Select Product</option>
-                {products.map((item) => (
-                  <option key={item._id} value={item._id}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
             <div>
               <label htmlFor="housewareId" className="block text-sm font-semibold text-black mb-1">
                 Select Houseware
@@ -123,6 +105,24 @@ const ImportStock: React.FC = () => {
               >
                 <option value="">Select houseware</option>
                 {housewares.map((item) => (
+                  <option key={item._id} value={item._id}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="stockId" className="block text-sm font-semibold text-black mb-1">
+                Select Product
+              </label>
+              <select
+                id="productId"
+                className="w-full rounded-md border px-4 py-2"
+                {...register("productId", { required: true })}
+              >
+                <option value="">Select Product</option>
+                {products.map((item) => (
                   <option key={item._id} value={item._id}>
                     {item.name}
                   </option>
@@ -153,7 +153,7 @@ const ImportStock: React.FC = () => {
           <div className="flex flex-col items-center justify-center relative">
             {imagePreview ? (
               <>
-                  <h1 className="font-semibold text-lg  mb-3">Image product </h1>
+                <h1 className="font-semibold text-lg  mb-3">Image product </h1>
                 <img
                   src={imagePreview}
                   alt="Preview"
