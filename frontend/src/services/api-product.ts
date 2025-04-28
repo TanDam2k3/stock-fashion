@@ -4,11 +4,11 @@ import Cookies from 'js-cookie';
 import { ProductPayload, ProductSearchPayload } from "../interfaces";
 
 
-const TOKEN = Cookies.get('token') || null;
-
 class ProductService {
   public async create(payload: ProductPayload) {
     try {
+      const TOKEN = Cookies.get('token') || null;
+
       const response = await axios.post(
         `${API_END_POINT}/api/products/create`,
         payload,
@@ -27,6 +27,8 @@ class ProductService {
 
   public async uploadImage(file: File) {
     try {
+      const TOKEN = Cookies.get('token') || null;
+
       const formData = new FormData();
       formData.append('file', file);
 
@@ -49,6 +51,8 @@ class ProductService {
 
 
   public async getList(filters?: ProductSearchPayload) {
+    const TOKEN = Cookies.get('token') || null;
+
     const payload = {
       ...(filters?.name && { name: filters.name }),
       ...(filters?.type && { type: filters.type }),
@@ -74,6 +78,8 @@ class ProductService {
 
   public async update(payload: ProductPayload) {
     try {
+      const TOKEN = Cookies.get('token') || null;
+
       const response = await axios.put(`${API_END_POINT}/api/products/update`,
         payload,
         {
@@ -93,6 +99,8 @@ class ProductService {
 
   public async delete(id: string) {
     try {
+      const TOKEN = Cookies.get('token') || null;
+
       const response = await axios.delete(`${API_END_POINT}/api/products/delete`, {
         headers: {
           Authorization: `Bearer ${TOKEN}`,

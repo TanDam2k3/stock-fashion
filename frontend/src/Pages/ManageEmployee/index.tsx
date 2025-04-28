@@ -1,19 +1,12 @@
-import React, { useState } from 'react';
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ConfirmDeletePopup from '../../components/popup/confirm-deleted-popup';
 import EmployeeFilter from '../../components/manage-employees/filter';
 import EditEmployeePopup from '../../components/manage-employees/edit-employees';
-
-interface Employee {
-  id: string;
-  name: string;
-  username: string; 
-  warehouse: string; 
-  phone: string;
-  email: string;
-  address: string;
-  avatar?: string;
-}
+import { userService } from '../../services';
+import { IEmployee } from '../../interfaces';
+import { toast } from 'react-toastify';
 
 const EmployeeTable: React.FC = () => {
   const navigate = useNavigate();
@@ -21,40 +14,8 @@ const EmployeeTable: React.FC = () => {
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showEditPopup, setShowEditPopup] = useState<boolean>(false);
-  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
-
-  const employees: Employee[] = [
-    {
-      id: '1',
-      name: 'Nguyễn Văn A',
-      username: 'nguyenvana',
-      warehouse: 'Kho A',
-      phone: '0123456789',
-      email: 'nguyenvana@example.com',
-      address: 'Hẻm 5/12/123/3123/123123 Đường ABC, Quận 1, TP.HCM',
-      avatar: 'https://i.pravatar.cc/150?img=1',
-    },
-    {
-      id: '2',
-      name: 'Trần Thị B',
-      username: 'tranthib',
-      warehouse: 'Kho B',
-      phone: '0987654321',
-      email: 'tranthib@example.com',
-      address: '456 Đường XYZ, Quận 2, TP.HCM',
-      avatar: 'https://i.pravatar.cc/150?img=2',
-    },
-    {
-      id: '3',
-      name: 'Lê Văn C',
-      username: 'levanc',
-      warehouse: 'Kho C',
-      phone: '0369852147',
-      email: 'levanc@example.com',
-      address: '789 Đường DEF, Quận 3, TP.HCM',
-      avatar: 'https://i.pravatar.cc/150?img=3',
-    },
-  ];
+  const [editingEmployee, setEditingEmployee] = useState<IEmployee | null>(null);
+  const [listUser, setListUser] = useState<IEmployee[]>([]);
 
   const handleCreate = () => {
     navigate('/employees/create');
@@ -65,25 +26,52 @@ const EmployeeTable: React.FC = () => {
     setShowConfirmPopup(true);
   };
 
-  const handleEdit = (employee: Employee) => {
+  const handleEdit = (employee: IEmployee) => {
     setEditingEmployee(employee);
     setShowEditPopup(true);
   };
 
-  const confirmDelete = () => {
+  const handleUpdateEmployee = async (data: IEmployee) => {
+    setShowEditPopup(false);
+    try {
+      const updateEmployee = await userService.update(data);
+      console.log('updateEmployee', updateEmployee)
+      if (updateEmployee.message === 'Updated success') {
+        toast.success('Updated success');
+        getList();
+      } else {
+        toast.error('Update fail');
+      }
+    } catch (e) {
+      toast.error(`${e}`);
+    }
+  }
+
+  const confirmDelete = async () => {
     if (selectedEmployeeId) {
-      console.log('Xóa nhân viên có ID:', selectedEmployeeId);
-      alert(`Đã xóa nhân viên có ID: ${selectedEmployeeId}`);
+      const deleteUser = await userService.delete(selectedEmployeeId);
+      if (deleteUser.message === 'Deleted success') {
+        toast.success('Deleted success');
+        getList();
+      } else {
+        toast.error(deleteUser?.message || 'Deleted fail');
+      }
       setShowConfirmPopup(false);
       setSelectedEmployeeId(null);
     }
   };
 
-  // Filter employees based on searchTerm and departmentFilter
-  const filteredEmployees = employees.filter((employee) => {
-    const nameMatch = employee.name.toLowerCase().includes(searchTerm.toLowerCase());
-    return nameMatch  ;
-  });
+  const getList = async () => {
+    const response = await userService.getList({
+      name: searchTerm,
+      status: 'active'
+    });
+    response?.users?.length && setListUser(response.users);
+  }
+
+  useEffect(() => {
+    getList();
+  }, [searchTerm]);
 
   return (
     <div className="bg-white text-gray-900 font-sans p-6 rounded-lg shadow-md min-h-screen">
@@ -108,23 +96,22 @@ const EmployeeTable: React.FC = () => {
 
       <div className="overflow-x-auto">
         <table className="min-w-full border-collapse table-fixed">
-        <thead className="bg-gray-50">
-  <tr>
-    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Ảnh</th>
-    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Họ tên</th>
-    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Username</th>
-    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Kho hàng</th>
-    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Điện thoại</th>
-    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Email</th>
-    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Địa chỉ</th>
-    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Thao tác</th>
-  </tr>
-</thead>
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Ảnh</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Họ tên</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Username</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Điện thoại</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Email</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Địa chỉ</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Thao tác</th>
+            </tr>
+          </thead>
 
           <tbody className="bg-white divide-y divide-gray-200">
-            {filteredEmployees.map((employee, index) => (
+            {listUser?.length > 0 && listUser.map((employee, index) => (
               <tr
-                key={employee.id}
+                key={employee._id}
                 className={`transition-colors hover:bg-gray-100 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-100'}`}
               >
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -139,13 +126,10 @@ const EmployeeTable: React.FC = () => {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap truncate">
-                <div className="text-sm font-medium text-gray-900">{employee.name}</div>
+                  <div className="text-sm font-medium text-gray-900">{employee.name}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-500">{employee.username}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-500">{employee.warehouse}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-500">{employee.phone}</div>
@@ -158,8 +142,8 @@ const EmployeeTable: React.FC = () => {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-normal break-words">
-  <div className="text-sm text-gray-500">{employee.address}</div>
-</td>
+                  <div className="text-sm text-gray-500">{employee.address}</div>
+                </td>
 
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex space-x-2">
@@ -174,9 +158,10 @@ const EmployeeTable: React.FC = () => {
                           strokeWidth={2}
                           d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                         />
-                      </svg>      </button>
+                      </svg>
+                    </button>
                     <button
-                      onClick={() => handleDelete(employee.id)}
+                      onClick={() => handleDelete(employee._id)}
                       className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md transition-colors flex items-center"
                     >
                       <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -203,9 +188,7 @@ const EmployeeTable: React.FC = () => {
         <EditEmployeePopup
           employee={editingEmployee}
           onClose={() => setShowEditPopup(false)}
-          onSave={() => {
-            setShowEditPopup(false);
-          }}
+          onSave={handleUpdateEmployee}
         />
       )}
     </div>
