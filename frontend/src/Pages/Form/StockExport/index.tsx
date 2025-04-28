@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { AuthContext } from "../../../contexts/AuthContext";
+// import { AuthContext } from "../../../contexts/AuthContext";
 
 type Inputs = {
   stockId: string;
@@ -10,7 +10,7 @@ type Inputs = {
 
 const ExportStock: React.FC = () => {
   const { register, handleSubmit, watch, setError, clearErrors } = useForm<Inputs>();
-  const { user } = useContext(AuthContext);
+  // const { user } = useContext(AuthContext);
 
   const [stocks, setStocks] = useState<any[]>([]);
   const [housewares, setHousewares] = useState<any[]>([]);
