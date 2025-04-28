@@ -60,25 +60,25 @@ const Login: React.FC = () => {
 
   return (
     <div className="bg-white min-h-screen flex items-center justify-center p-4">
-      <div className="flex max-w-4xl w-full rounded-lg shadow-md overflow-hidden" style={{ borderRadius: "0.75rem" }}>
-        <img
-          src="https://storage.googleapis.com/a1aa/image/45d85b4b-49ae-42df-d030-3e84794ff5a7.jpg"
-          alt="Warehouse interior"
-          className="w-1/2 object-cover"
-          width={600}
-          height={400}
-        />
+      <div className="flex flex-col md:flex-row max-w-4xl w-full rounded-lg shadow-md overflow-hidden" style={{ borderRadius: "0.75rem" }}>
+        {/* Image */}
+        <div className="w-full md:w-1/2 h-60 md:h-auto">
+          <img
+            src="https://storage.googleapis.com/a1aa/image/45d85b4b-49ae-42df-d030-3e84794ff5a7.jpg"
+            alt="Warehouse interior"
+            className="w-full h-full object-cover"
+          />
+        </div>
+
+        {/* Form */}
         <form
           autoComplete="off"
           onSubmit={handleSubmit(onSubmit)}
-          className="w-1/2 bg-white px-6 py-10 rounded-r-lg shadow-md flex items-center justify-center"
+          className="w-full md:w-1/2 bg-white px-6 py-10 flex items-center justify-center"
           style={{ borderTopRightRadius: "0.75rem", borderBottomRightRadius: "0.75rem" }}
         >
           <div className="w-full">
-            <h2
-              className="mb-4 font-heading text-[#0f2f7f] text-lg font-bold text-center"
-              style={{ fontFamily: "Arial, sans-serif" }}
-            >
+            <h2 className="mb-4 text-[#0f2f7f] text-lg font-bold text-center" style={{ fontFamily: "Arial, sans-serif" }}>
               ĐĂNG NHẬP VÀO TÀI KHOẢN
             </h2>
 
@@ -123,14 +123,17 @@ const Login: React.FC = () => {
             >
               ĐĂNG NHẬP
             </button>
-            <span className="text-xs">
+            <span className="text-xs block text-center mt-2">
               Don’t have an account?{" "}
-              <span onClick={() => navigate("/register")} className="text-blue-500 cursor-pointer">Sign up now.</span>
+              <span onClick={() => navigate("/register")} className="text-blue-500 cursor-pointer">
+                Sign up now.
+              </span>
             </span>
           </div>
         </form>
       </div>
 
+      {/* Popup */}
       <SuccessPopup
         message="Đăng nhập thành công!"
         isOpen={showPopup}

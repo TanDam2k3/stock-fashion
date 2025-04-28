@@ -179,6 +179,13 @@ const CreateProduct: React.FC = () => {
                 <option>Áo</option>
                 <option>Áo khoác</option>
                 <option>Quần</option>
+                <option>Đầm</option>
+                <option>Chân váy</option>
+                <option>Áo thun</option>
+                <option>Áo sơ mi</option>
+                <option>Quần jean</option>
+                <option>Quần short</option>
+                <option>Vest</option>
               </select>
             </div>
 
@@ -213,23 +220,26 @@ const CreateProduct: React.FC = () => {
             </div>
           </div>
 
-          <div className="mb-4">
-            <label
-              htmlFor="productImage"
-              className="block text-sm font-semibold text-black mb-2"
-            >
-              Product Image
-            </label>
-            <div className="flex items-center gap-4">
-              <input
-                id="productImage"
-                type="file"
-                accept="image/*"
-                className="flex-1 rounded-md border border-gray-200 bg-white text-gray-700 file:bg-[#0a162c] file:text-white file:px-4 file:py-2 file:rounded-l-md file:border-none file:cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0a162c] focus:border-transparent"
-                {...register("file")}
-              />
-            </div>
-          </div>
+              <div className="mb-4 w-full">
+      <label
+        htmlFor="productImage"
+        className="block text-sm font-semibold text-black mb-2"
+      >
+        Product Image
+      </label>
+      <div className="flex flex-col sm:flex-row items-center gap-4">
+        <input
+          id="productImage"
+          type="file"
+          accept="image/*"
+          className="w-full sm:flex-1 rounded-md border border-gray-200 bg-white text-gray-700 
+            file:bg-[#0a162c] file:text-white file:px-4 file:py-2 file:rounded-l-md file:border-none 
+            file:cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0a162c] focus:border-transparent"
+          {...register("file")}
+        />
+      </div>
+    </div>
+
 
           <div className="flex gap-3">
             <button

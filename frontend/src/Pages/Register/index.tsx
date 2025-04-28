@@ -53,23 +53,26 @@ const Register: React.FC = () => {
 
   return (
     <div className="bg-white min-h-screen flex items-center justify-center p-4">
-      <div className="flex max-w-4xl w-full rounded-lg shadow-md overflow-hidden">
+      <div className="flex flex-col lg:flex-row max-w-4xl w-full rounded-lg shadow-md overflow-hidden">
+        {/* Image */}
         <img
           src="https://storage.googleapis.com/a1aa/image/45d85b4b-49ae-42df-d030-3e84794ff5a7.jpg"
           alt="Warehouse interior"
-          className="w-1/2 object-cover"
+          className="w-full lg:w-1/2 object-cover h-64 lg:h-auto"
         />
+
+        {/* Form */}
         <form
           autoComplete="off"
           onSubmit={handleSubmit(onSubmit)}
-          className="w-1/2 bg-white px-6 py-10 rounded-r-lg shadow-md flex items-center justify-center"
+          className="w-full lg:w-1/2 bg-white px-6 py-10 rounded-r-lg shadow-md flex flex-col items-center justify-center"
         >
           <div className="w-full">
-            <h2 className="mb-4 text-[#0f2f7f] text-lg font-bold text-center">
+            <h2 className="mb-4 text-[#0f2f7f] text-xl font-bold text-center">
               TẠO TÀI KHOẢN MỚI
             </h2>
 
-            <label htmlFor="username" className="block mb-1">
+            <label htmlFor="username" className="block mb-1 text-sm">
               Tên đăng nhập
             </label>
             <input
@@ -79,7 +82,7 @@ const Register: React.FC = () => {
               {...register("username")}
             />
 
-            <label htmlFor="email" className="block mb-1">
+            <label htmlFor="email" className="block mb-1 text-sm">
               Email
             </label>
             <input
@@ -88,7 +91,8 @@ const Register: React.FC = () => {
               className="w-full border-b border-b-gray-400 px-2 py-2 text-sm mb-4"
               {...register("email")}
             />
-            <label htmlFor="password" className="block mb-1">
+
+            <label htmlFor="password" className="block mb-1 text-sm">
               Mật khẩu
             </label>
             <input
@@ -98,7 +102,7 @@ const Register: React.FC = () => {
               {...register("password")}
             />
 
-            <label htmlFor="confirmPassword" className="block mb-1">
+            <label htmlFor="confirmPassword" className="block mb-1 text-sm">
               Xác nhận mật khẩu
             </label>
             <input
@@ -110,7 +114,7 @@ const Register: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full bg-blue-900 text-white text-xs font-semibold py-2 rounded"
+              className="w-full bg-blue-900 text-white text-xs font-semibold py-2 rounded mt-4"
             >
               ĐĂNG KÝ
             </button>
@@ -127,6 +131,8 @@ const Register: React.FC = () => {
           </div>
         </form>
       </div>
+
+      {/* Success Popup */}
       <SuccessPopup
         message="Đăng ký thành công!"
         isOpen={showPopup}
