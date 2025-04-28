@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const errorHandler = require('./middlewares/errorHandler');
 
 const authRoutes = require('./routes/authRoutes');
@@ -24,5 +23,18 @@ app.use('/api/files', fileRoutes);
 app.use(express.static('public'));
 
 app.use(errorHandler);
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  res.status(500).json({
+    success: false,
+    message: err.message || 'Something went wrong!'
+  });
+});
 
 module.exports = app;

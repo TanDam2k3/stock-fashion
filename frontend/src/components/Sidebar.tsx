@@ -27,6 +27,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
+  const { user } = useContext(AuthContext);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const { logout } = useContext(AuthContext);
 
@@ -127,15 +128,20 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
           )}
 
           {menuItem(<FaCogs />, "Setting", "settings")}
-          {menuItem(<FaUserFriends />, "Nhân sự", undefined, () =>
-            toggleDropdown("employee"), true, "employee"
+          {user && user.role === 'admin' && (
+            <>
+              {menuItem(<FaUserFriends />, "Nhân sự", undefined, () =>
+                toggleDropdown("employee"), true, "employee"
+              )}
+              {openDropdown === "employee" && isOpen && (
+                <ul className="ml-8">
+                  {dropdownItem("employees/create", "Tạo mới nhân sự")}
+                  {dropdownItem("employees", "Quản lý nhân sự")}
+                </ul>
+              )}
+            </>
           )}
-          {openDropdown === "employee" && isOpen && (
-            <ul className="ml-8">
-              {dropdownItem("employees/create", "Tạo mới nhân sự")}
-              {dropdownItem("employees", "Quản lý nhân sự")}
-            </ul>
-          )}
+
           {menuItem(<TbLogout2 />, "Log out", "login", logout)}
 
         </ul>

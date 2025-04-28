@@ -71,8 +71,6 @@ const CreateProduct: React.FC = () => {
       identification: `${Date.now()}`
     };
 
-    console.log('newProduct', newProduct)
-
     newProduct && setProducts([...products, newProduct]);
     reset();
   };
