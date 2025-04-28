@@ -1,5 +1,4 @@
 import React from 'react';
-import { CiSearch } from "react-icons/ci";
 
 interface EmployeeFilterProps {
   searchTerm: string;
@@ -20,9 +19,7 @@ const EmployeeFilter: React.FC<EmployeeFilterProps> = ({
         value={searchTerm}
         onChange={(e) => onSearchChange(e.target.value)}
         className="border border-gray-300 rounded-md px-4 py-2 w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-        <CiSearch className='absolute' />
-        </div>
+      />        </div>
         <div className="">
         </div>
      

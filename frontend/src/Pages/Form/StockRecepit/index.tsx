@@ -79,7 +79,7 @@ const ImportStock: React.FC = () => {
   }, [onChangeProduct]);
 
   return (
-    <div className="w-full rounded-md bg-white flex flex-col p-5 ">
+    <div className="w-full rounded-md bg-white flex flex-col p-5 min-h-full ">
       <form
         className="w-full"
         onSubmit={handleSubmit(onSubmit)}
@@ -87,7 +87,7 @@ const ImportStock: React.FC = () => {
         noValidate
       >
         <h2 className="text-black text-xl font-semibold mb-6">
-          Import Houseware
+          Import product
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -153,7 +153,7 @@ const ImportStock: React.FC = () => {
                 <img
                   src={imagePreview}
                   alt="Preview"
-                  className="w-40 h-40 object-cover rounded-full border cursor-pointer"
+                  className="w-100 h-96 object-cover  cursor-pointer"
                   onClick={() => setShowFullImage(true)}
                 />
                 {showFullImage && (
@@ -170,7 +170,7 @@ const ImportStock: React.FC = () => {
                 )}
               </>
             ) : (
-              <div className="w-40 h-40 flex items-center justify-center border rounded-full text-gray-400">
+              <div className="w-40 h-40 flex items-center justify-center border text-gray-400">
                 No Image
               </div>
             )}
