@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import React, { useContext, useEffect, useState } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { FaEye } from 'react-icons/fa';
 import ProductDetailPopup from '../../../components/transaction-history/edit-popup';
 import { ITransaction } from '../../../interfaces';
@@ -10,7 +10,7 @@ import { AuthContext } from '../../../contexts/AuthContext';
 const ExportHistory: React.FC = () => {
   const { user } = useContext(AuthContext);
   const [transactionExport, setTransactionExport] = useState<ITransaction[]>([]);
-  const [filter, setFilter] = useState({
+  const [filter] = useState({
     type: 'export',
     status: 'success',
     fromDate: null,
@@ -20,7 +20,7 @@ const ExportHistory: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<ITransaction | null>(null);
 
 
-  const { register, control, watch } = useForm<ITransaction>();
+  const { register } = useForm<ITransaction>();
 
 
   const handleViewDetail = (product: ITransaction) => {
@@ -48,7 +48,7 @@ const ExportHistory: React.FC = () => {
 
   return (
     <div className="w-full rounded-md flex flex-col p-5 min-h-full">
-      <div className="max-w-7xl mx-auto">
+      <div className="min-w-[1200px] mx-auto">
         {/* Bộ lọc khoảng ngày */}
         <div className="bg-white rounded-md px-2">
           <h1 className='text-xl font-semibold'>EXPORT HISTORY</h1>

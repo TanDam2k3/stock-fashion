@@ -18,6 +18,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import ImportStock from "./Pages/Form/StockRecepit";
 import ExportStock from "./Pages/Form/StockExport";
 import ExportHistory from "./Pages/TransactionHistory/ExportHistory";
+import ImportHistory from "./Pages/TransactionHistory/ImportHistory";
 
 const App = () => {
   return (
@@ -42,6 +43,7 @@ const App = () => {
               <Route path="employees/create" element={<CreateEmployee />} />
               <Route path="import" element={<ImportStock />} />
               <Route path="export" element={<ExportStock />} />
+              <Route path="report/import" element={<ImportHistory />} />
               <Route path="report/export" element={<ExportHistory />} />
 
 

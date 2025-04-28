@@ -1,7 +1,7 @@
 import axios from "axios";
 import { API_END_POINT } from "../config";
 import Cookies from 'js-cookie';
-import { ICreateUser, ISearchUser } from "../interfaces";
+import { ICreateUser, ISearchTransaction } from "../interfaces";
 import { IStockImport } from "../interfaces/stock";
 
 
@@ -26,16 +26,17 @@ class ImportProductService {
         }
     }
 
-    public async getList(filters: ISearchUser) {
+    public async getList(filters: ISearchTransaction) {
         try {
             const payload = {
-                ...(filters?.name && { name: filters.name }),
+                ...(filters?.userId && { userId: filters.userId }),
+                ...(filters?.type && { type: filters.type }),
                 ...(filters?.status && { status: filters.status })
             }
             const TOKEN = Cookies.get('token') || null;
 
             const response = await axios.get(
-                `${API_END_POINT}/api/admin/list`,
+                `${API_END_POINT}/api/stocks/list`,
                 {
                     headers: {
                         Authorization: `Bearer ${TOKEN}`

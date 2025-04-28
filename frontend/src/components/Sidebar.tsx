@@ -42,35 +42,43 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
     onClick?: () => void,
     hasDropdown?: boolean,
     dropdownKey?: string
-  ) => (
-    <li
-      className={`p-4 hover:bg-primary-th1/40 transition-colors duration-300 ease-in-out cursor-pointer flex items-center ${isOpen ? "justify-between" : "justify-center"
-        }`}
-
-      onClick={onClick}
-    >
-      {to ? (
-        <Link to={to} className="flex items-center gap-2">
-          {icon}
-          {isOpen && <span>{label}</span>}
-        </Link>
-      ) : (
+  ) => {
+    const content = (
+      <div className="flex items-center justify-between w-full">
         <div className="flex items-center gap-2">
           {icon}
           {isOpen && <span>{label}</span>}
         </div>
-      )}
-
-      {/* Icon bên phải */}
-      {isOpen &&
-        hasDropdown &&
-        (openDropdown === dropdownKey ? (
-          <MdKeyboardArrowDown size={25} />
-        ) : (
-          <MdArrowForwardIos />
-        ))}
-    </li>
-  );
+        {isOpen && hasDropdown && (
+          openDropdown === dropdownKey ? (
+            <MdKeyboardArrowDown size={25} />
+          ) : (
+            <MdArrowForwardIos />
+          )
+        )}
+      </div>
+    );
+  
+    if (to) {
+      return (
+        <Link to={to} onClick={onClick}>
+          <li className="p-4 hover:bg-primary-th1/40 transition-colors duration-300 ease-in-out cursor-pointer flex items-center justify-center">
+            {content}
+          </li>
+        </Link>
+      );
+    } else {
+      return (
+        <li
+          className="p-4 hover:bg-primary-th1/40 transition-colors duration-300 ease-in-out cursor-pointer flex items-center justify-center"
+          onClick={onClick}
+        >
+          {content}
+        </li>
+      );
+    }
+  };
+  
 
 
 
