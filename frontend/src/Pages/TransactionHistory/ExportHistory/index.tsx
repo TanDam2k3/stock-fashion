@@ -1,53 +1,29 @@
-import React, { useState } from 'react';
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+import React, { useContext, useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { FaEye } from 'react-icons/fa'; 
+import { FaEye } from 'react-icons/fa';
 import ProductDetailPopup from '../../../components/transaction-history/edit-popup';
-
-interface Product {
-  id: string;
-  stock: string; 
-  quantity: number;
-  product: string;
-  username: string;
-  createAt: Date,
-  imageId:string;
-}
-
-interface FormValues {
-  products: Product[];
-}
+import { ITransaction } from '../../../interfaces';
+import { exportProductService } from '../../../services';
+import { AuthContext } from '../../../contexts/AuthContext';
 
 const ExportHistory: React.FC = () => {
-  const apiProducts: Product[] = [
-    {
-      id: 'SP001',
-      stock:'HCM',
-      quantity: 2,
-      product: 'Áo thun cổ tròn',
-      username: 'user1',
-      createAt: new Date('2023-11-20'), 
-      imageId: '123456'
-
-    },
-  ];
-
-  const { register, control, watch } = useForm<FormValues>({
-    defaultValues: {
-      products: apiProducts,
-    },
+  const { user } = useContext(AuthContext);
+  const [transactionExport, setTransactionExport] = useState<ITransaction[]>([]);
+  const [filter, setFilter] = useState({
+    type: 'export',
+    status: 'success',
+    fromDate: null,
+    toDate: null
   });
-
-  const { fields } = useFieldArray({
-    control,
-    name: 'products',
-  });
-
-  const products = watch('products');
-  
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<ITransaction | null>(null);
 
-  const handleViewDetail = (product: Product) => {
+
+  const { register, control, watch } = useForm<ITransaction>();
+
+
+  const handleViewDetail = (product: ITransaction) => {
     setSelectedProduct(product);
     setIsPopupOpen(true);
   };
@@ -56,6 +32,19 @@ const ExportHistory: React.FC = () => {
     setIsPopupOpen(false);
     setSelectedProduct(null);
   };
+
+  const getTransaction = async () => {
+    const transaction = await exportProductService.getList({
+      ...filter,
+      userId: user?._id
+    });
+    console.log('transaction', transaction)
+    transaction?.length && setTransactionExport(transaction);
+  }
+
+  useEffect(() => {
+    getTransaction();
+  }, [filter]);
 
   return (
     <div className="w-full rounded-md flex flex-col p-5 min-h-full">
@@ -110,29 +99,29 @@ const ExportHistory: React.FC = () => {
                 <th className="py-2 px-3 border border-[#AFC3F7]">Tên sản phẩm</th>
                 <th className="py-2 px-3 border border-[#AFC3F7]">Số lượng</th>
                 <th className="py-2 px-3 border border-[#AFC3F7]">Người thực hiện</th>
-                <th className="py-2 px-3 border border-[#AFC3F7]">View</th> 
+                <th className="py-2 px-3 border border-[#AFC3F7]">View</th>
               </tr>
             </thead>
             <tbody>
-              {fields.map((field, index) => (
-                <tr key={field.id} className="text-center text-[#1E1E1E]">
+              {transactionExport?.length > 0 && transactionExport.map((transaction) => (
+                <tr key={transaction._id} className="text-center text-[#1E1E1E]">
                   <td className="border border-[#E5E7EB] p-1">
                     <input
-                      {...register(`products.${index}.id`)}
+                      {...register('_id')}
                       readOnly
                       className="w-full border rounded px-2 py-1 bg-[#F9FAFB] cursor-not-allowed text-center"
                     />
                   </td>
                   <td className="border border-[#E5E7EB] p-1">
                     <input
-                      {...register(`products.${index}.stock`)}
+                      {...register('housewareName')}
                       readOnly
                       className="w-full border rounded px-2 py-1 bg-[#F9FAFB] cursor-not-allowed text-center"
                     />
                   </td>
                   <td className="border border-[#E5E7EB] p-1">
                     <input
-                      {...register(`products.${index}.product`)}
+                      {...register('productName')}
                       readOnly
                       className="w-full border rounded px-2 py-1 bg-[#F9FAFB] cursor-not-allowed text-center"
                     />
@@ -140,14 +129,14 @@ const ExportHistory: React.FC = () => {
                   <td className="border border-[#E5E7EB] p-1">
                     <input
                       type="number"
-                      {...register(`products.${index}.quantity`, { valueAsNumber: true })}
+                      {...register('quantity', { valueAsNumber: true })}
                       readOnly
                       className="w-full border rounded px-2 py-1 bg-[#F9FAFB] cursor-not-allowed text-center"
                     />
                   </td>
                   <td className="border border-[#E5E7EB] p-1">
                     <input
-                      {...register(`products.${index}.username`)}
+                      {...register('userName')}
                       readOnly
                       className="w-full border rounded px-2 py-1 bg-[#F9FAFB] cursor-not-allowed text-center"
                     />
@@ -155,7 +144,7 @@ const ExportHistory: React.FC = () => {
                   <td className="border border-[#E5E7EB] p-1">
                     <button
                       type="button"
-                      onClick={() => handleViewDetail(products[index])}
+                      onClick={() => handleViewDetail(transaction)}
                       className="flex justify-center items-center w-full text-blue-500 hover:text-blue-700"
                     >
                       <FaEye />

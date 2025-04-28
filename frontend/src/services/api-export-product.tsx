@@ -1,17 +1,17 @@
 import axios from "axios";
 import { API_END_POINT } from "../config";
 import Cookies from 'js-cookie';
-import { ICreateUser, ISearchUser } from "../interfaces";
-import { IStockImport } from "../interfaces/stock";
+import { ISearchTransaction } from "../interfaces";
+import { IStockExport } from "../interfaces/stock";
 
 
 class ExportProductService {
-    public async create(payload: IStockImport) {
+    public async create(payload: IStockExport) {
         try {
             const TOKEN = Cookies.get('token') || null;
 
             const response = await axios.post(
-                `${API_END_POINT}/api/stocks/import`,
+                `${API_END_POINT}/api/stocks/export`,
                 payload,
                 {
                     headers: {
@@ -21,21 +21,22 @@ class ExportProductService {
             );
             return response.data;
         } catch (error) {
-            console.error("Failed to create import transaction:", error);
+            console.error("Failed to create export transaction:", error);
             throw error;
         }
     }
 
-    public async getList(filters: ISearchUser) {
+    public async getList(filters: ISearchTransaction) {
         try {
             const payload = {
-                ...(filters?.name && { name: filters.name }),
+                ...(filters?.userId && { userId: filters.userId }),
+                ...(filters?.type && { type: filters.type }),
                 ...(filters?.status && { status: filters.status })
             }
             const TOKEN = Cookies.get('token') || null;
 
             const response = await axios.get(
-                `${API_END_POINT}/api/admin/list`,
+                `${API_END_POINT}/api/stocks/list`,
                 {
                     headers: {
                         Authorization: `Bearer ${TOKEN}`
@@ -50,43 +51,6 @@ class ExportProductService {
         }
     }
 
-    public async update(payload: ICreateUser) {
-        try {
-            const TOKEN = Cookies.get('token') || null;
-
-            const response = await axios.post(
-                `${API_END_POINT}/api/admin/update`,
-                payload,
-                {
-                    headers: {
-                        Authorization: `Bearer ${TOKEN}`,
-                    },
-                }
-            );
-            return response.data;
-        } catch (error) {
-            console.error("Admin update user fail:", error);
-            throw error;
-        }
-    }
-
-    public async delete(id: string) {
-        try {
-            const TOKEN = Cookies.get('token') || null;
-
-            const response = await axios.delete(`${API_END_POINT}/api/admin/deleted`, {
-                headers: {
-                    Authorization: `Bearer ${TOKEN}`,
-                    'Content-Type': 'application/json'
-                },
-                data: { _id: id },
-            });
-            return response.data;
-        } catch (error) {
-            console.error('Delete user from admin error:', error);
-            return { success: false };
-        }
-    };
 }
 
 export const exportProductService = new ExportProductService();

@@ -1,6 +1,8 @@
 const stockTransactionModel = require('../models/StockTransaction');
 const httpErrorService = require('./httpErrorService');
 const productService = require('./productService');
+const housewareService = require('./housewareService');
+const userService = require('./userService');
 
 const create = async (payload) => {
   try {
@@ -28,7 +30,26 @@ const create = async (payload) => {
 const getTransactions = async (query) => {
   try {
     const data = await stockTransactionModel.find(query).lean();
-    return data;
+    if (!data?.length) return [];
+    const productIds = data.map((d) => d?.productId);
+    const housewareIds = data.map((d) => d?.housewareId);
+    const [products, housewares, user] = await Promise.all([
+      productService.getList({ _id: { $in: productIds } }),
+      housewareService.getList({ _id: { $in: housewareIds } }),
+      userService.getDetail({ _id: data[0].userId })
+    ]);
+    const dataResponse = data.map((d) => {
+      const product = products.find((p) => `${p._id}` === `${d.productId}`);
+      const houseware = housewares.find((h) => `${h._id}` === `${d.housewareId}`);
+      return {
+        ...d,
+        imageUrl: product?.imageUrl || '',
+        housewareName: houseware?.name || '',
+        productName: product?.name || '',
+        userName: user.name
+      };
+    });
+    return dataResponse;
   } catch (e) {
     await httpErrorService.create(e, 'Get list stock transaction Service');
     return [];
