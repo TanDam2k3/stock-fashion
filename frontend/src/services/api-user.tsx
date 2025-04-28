@@ -1,7 +1,7 @@
 import axios from "axios";
 import { API_END_POINT } from "../config";
 import Cookies from 'js-cookie';
-import { ICreateUser, ISearchUser } from "../interfaces";
+import { ICreateUser, ISearchUser, IUserUpdate } from "../interfaces";
 
 
 class UserService {
@@ -103,6 +103,26 @@ class UserService {
             return response.data;
         } catch (error) {
             console.error("Finde detail user fail:", error);
+            throw error;
+        }
+    }
+
+    public async updateUser(payload: IUserUpdate) {
+        try {
+            const TOKEN = Cookies.get('token') || null;
+
+            const response = await axios.put(
+                `${API_END_POINT}/api/user/update`,
+                payload,
+                {
+                    headers: {
+                        Authorization: `Bearer ${TOKEN}`,
+                    },
+                }
+            );
+            return response.data;
+        } catch (error) {
+            console.error("Admin update user fail:", error);
             throw error;
         }
     }
