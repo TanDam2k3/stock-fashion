@@ -1,118 +1,81 @@
-import React, { useState, useRef, ChangeEvent } from "react";
+import React, { useContext, useEffect, useRef } from "react";
+import { useForm } from "react-hook-form";
+import { AuthContext } from "../../contexts/AuthContext";
+
+type FormValues = {
+  username: string;
+  displayname: string;
+  password?: string;
+  retypePassword?: string;
+  email: string;
+  phone?: string;
+  address?: string;
+};
 
 const Settings = () => {
-  // const { user } = useContext(AuthContext);
+    const { user } = useContext(AuthContext);
+    console.log("user",user)
+  
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+    reset,
+  } = useForm<FormValues>({
+    defaultValues: {
+      username: "",
+      displayname: "",
+      email: "",
+      phone: "",
+      address: "",
+    },
+  });
+  useEffect(() => {
+    if (user) {
+      reset({
+        username: user.username || "",
+        displayname: user.name || "",
+        password:  "",
+        retypePassword:  "",
+        email: user.email || "",
+        phone: user.phone || "",
+        address: user.address || "",
+      });
+      setAvatar(user.avatar || "https://via.placeholder.com/80");
+    }
+  }, [user, reset]);
 
-  const [formData, setFormData] = useState({
-    username: "",
-    displayname: "",
-    password: "",
-    retypePassword: "",
-    email: "",
-    phone: "",
-    address: "",
-  });
-  const [errors, setErrors] = useState({
-    username: "",
-    displayname: "",
-    password: "",
-    retypePassword: "",
-    email: "",
-    phone: "",
-    address: "",
-  });
-  const [avatar, setAvatar] = useState<string | null>(
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [avatar, setAvatar] = React.useState<string | null>(
     "https://storage.googleapis.com/a1aa/image/af42f901-0589-43cf-80a0-b4a1ad71c358.jpg"
   );
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
+  const passwordValue = watch("password");
+
+  const onSubmit = (data: FormValues) => {
+    // Validate password match manually (vì cần so sánh 2 field)
+    if (data.password && data.password !== data.retypePassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    console.log({
+      ...data,
+      avatar,
     });
 
-    // Clear error when user types
-    if (errors[name as keyof typeof errors]) {
-      setErrors({
-        ...errors,
-        [name]: "",
-      });
-    }
+    // Reset form nếu cần
+    // reset();
   };
 
-  const validateForm = () => {
-    let valid = true;
-    const newErrors = { ...errors };
-
-    // Username validation
-    if (!formData.username.trim()) {
-      newErrors.username = "Username is required";
-      valid = false;
-    } else if (formData.username.length < 3) {
-      newErrors.username = "Username must be at least 3 characters";
-      valid = false;
-    }
-
-    // Display name validation
-    if (!formData.displayname.trim()) {
-      newErrors.displayname = "Display name is required";
-      valid = false;
-    }
-
-    // Password validation
-    if (formData.password) {
-      if (formData.password.length < 6) {
-        newErrors.password = "Password must be at least 6 characters";
-        valid = false;
-      } else if (!formData.retypePassword) {
-        newErrors.retypePassword = "Please retype your password";
-        valid = false;
-      } else if (formData.password !== formData.retypePassword) {
-        newErrors.retypePassword = "Passwords do not match";
-        valid = false;
-      }
-    }
-
-    // Email validation
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-      valid = false;
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
-      valid = false;
-    }
-
-    // Phone validation
-    if (formData.phone && !/^[\d\s\-()+]+$/.test(formData.phone)) {
-      newErrors.phone = "Please enter a valid phone number";
-      valid = false;
-    }
-
-    setErrors(newErrors);
-    return valid;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validateForm()) {
-      console.log({
-        ...formData,
-        avatar,
-      });
-      // Submit form data to your backend here
-    }
-  };
-
-  const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       if (!file.type.match("image.*")) {
         alert("Please select an image file");
         return;
       }
-
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
@@ -130,14 +93,15 @@ const Settings = () => {
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="bg-white rounded-lg shadow-sm max-w-full p-6">
-        <form onSubmit={handleSubmit} autoComplete="off" className="w-full">
-          {/* Avatar section - top right */}
+        <form onSubmit={handleSubmit(onSubmit)} noValidate className="w-full">
           <div className="flex justify-between items-start mb-6">
             <h2 className="text-xl font-bold text-slate-900">Settings</h2>
           </div>
+
+          {/* Avatar section */}
           <div className="flex flex-col items-start mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-20 h-20 rounded-full bg-slate-200 flex items-center justify-center overflow-hidden">
+              <div className="w-20 h-20 rounded-full bg-slate-200 overflow-hidden">
                 <img
                   alt="User avatar"
                   className="w-full h-full object-cover"
@@ -168,227 +132,143 @@ const Settings = () => {
 
           {/* Form fields */}
           <div className="space-y-6">
+            {/* Username */}
             <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="username">
+                Username
+              </label>
+              <input
+                {...register("username", {
+                  required: "Username is required",
+                  minLength: { value: 3, message: "Must be at least 3 characters" },
+                })}
+                className={`w-full pl-3 pr-3 py-2.5 text-sm rounded border ${
+                  errors.username ? "border-red-500" : "border-slate-200"
+                } focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
+                placeholder="Enter username"
+              />
               {errors.username && (
-                <p className="mt-1 text-xs text-red-500">{errors.username}</p>
+                <p className="mt-1 text-xs text-red-500">{errors.username.message}</p>
               )}
             </div>
-            {/* Username and Display Name row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-              <div>
-                <label
-                  className="block text-sm font-medium text-slate-700 mb-1"
-                  htmlFor="username"
-                >
-                  Username
-                </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-3 flex items-center text-slate-400">
-                    <i className="fas fa-user text-sm"></i>
-                  </span>
-                  <input
-                    className={`w-full pl-9 pr-3 py-2.5 text-sm rounded border ${errors.username ? "border-red-500" : "border-slate-200"
-                      } placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
-                    id="username"
-                    name="username"
-                    placeholder="Enter username"
-                    type="text"
-                    value={formData.username}
-                    onChange={handleChange}
-                  />
-                </div>
-                {errors.username && (
-                  <p className="mt-1 text-xs text-red-500">{errors.username}</p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  className="block text-sm font-medium text-slate-700 mb-1"
-                  htmlFor="displayname"
-                >
-                  Display Name
-                </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-3 flex items-center text-slate-400">
-                    <i className="fas fa-pencil-alt text-sm"></i>
-                  </span>
-                  <input
-                    className={`w-full pl-9 pr-3 py-2.5 text-sm rounded border ${errors.displayname ? "border-red-500" : "border-slate-200"
-                      } placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
-                    id="displayname"
-                    name="displayname"
-                    placeholder="Enter display name"
-                    type="text"
-                    value={formData.displayname}
-                    onChange={handleChange}
-                  />
-                </div>
-                {errors.displayname && (
-                  <p className="mt-1 text-xs text-red-500">
-                    {errors.displayname}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Password and Re-type Password row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label
-                  className="block text-sm font-medium text-slate-700 mb-1"
-                  htmlFor="password"
-                >
-                  Password
-                </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-3 flex items-center text-slate-400">
-                    <i className="fas fa-lock text-sm"></i>
-                  </span>
-                  <input
-                    className={`w-full pl-9 pr-3 py-2.5 text-sm rounded border ${errors.password ? "border-red-500" : "border-slate-200"
-                      } placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
-                    id="password"
-                    name="password"
-                    placeholder="Enter new password"
-                    type="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                  />
-                </div>
-                {errors.password && (
-                  <p className="mt-1 text-xs text-red-500">{errors.password}</p>
-                )}
-                {formData.password && !errors.password && (
-                  <p className="mt-1 text-xs text-green-500">
-                    Password strength:{" "}
-                    {formData.password.length < 6
-                      ? "Weak"
-                      : formData.password.length < 10
-                        ? "Medium"
-                        : "Strong"}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  className="block text-sm font-medium text-slate-700 mb-1"
-                  htmlFor="retypePassword"
-                >
-                  Re-type Password
-                </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-3 flex items-center text-slate-400">
-                    <i className="fas fa-lock text-sm"></i>
-                  </span>
-                  <input
-                    className={`w-full pl-9 pr-3 py-2.5 text-sm rounded border ${errors.retypePassword ? "border-red-500" : "border-slate-200"
-                      } placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
-                    id="retypePassword"
-                    name="retypePassword"
-                    placeholder="Re-enter password"
-                    type="password"
-                    value={formData.retypePassword}
-                    onChange={handleChange}
-                  />
-                </div>
-                {errors.retypePassword && (
-                  <p className="mt-1 text-xs text-red-500">
-                    {errors.retypePassword}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Email and Phone row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label
-                  className="block text-sm font-medium text-slate-700 mb-1"
-                  htmlFor="email"
-                >
-                  Email
-                </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-3 flex items-center text-slate-400">
-                    <i className="fas fa-envelope text-sm"></i>
-                  </span>
-                  <input
-                    className={`w-full pl-9 pr-3 py-2.5 text-sm rounded border ${errors.email ? "border-red-500" : "border-slate-200"
-                      } placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
-                    id="email"
-                    name="email"
-                    placeholder="Enter email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                  />
-                </div>
-                {errors.email && (
-                  <p className="mt-1 text-xs text-red-500">{errors.email}</p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  className="block text-sm font-medium text-slate-700 mb-1"
-                  htmlFor="phone"
-                >
-                  Phone Number
-                </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-3 flex items-center text-slate-400">
-                    <i className="fas fa-phone text-sm"></i>
-                  </span>
-                  <input
-                    className={`w-full pl-9 pr-3 py-2.5 text-sm rounded border ${errors.phone ? "border-red-500" : "border-slate-200"
-                      } placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
-                    id="phone"
-                    name="phone"
-                    placeholder="Enter phone number"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={handleChange}
-                  />
-                </div>
-                {errors.phone && (
-                  <p className="mt-1 text-xs text-red-500">{errors.phone}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Address (full width) */}
+            {/* Display Name */}
             <div>
-              <label
-                className="block text-sm font-medium text-slate-700 mb-1"
-                htmlFor="address"
-              >
+              <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="displayname">
+                Display Name
+              </label>
+              <input
+                {...register("displayname", { required: "Display name is required" })}
+                className={`w-full pl-3 pr-3 py-2.5 text-sm rounded border ${
+                  errors.displayname ? "border-red-500" : "border-slate-200"
+                } focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
+                placeholder="Enter display name"
+              />
+              {errors.displayname && (
+                <p className="mt-1 text-xs text-red-500">{errors.displayname.message}</p>
+              )}
+            </div>
+
+            {/* Password */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="password">
+                Password
+              </label>
+              <input
+                type="password"
+                {...register("password", {
+                  minLength: { value: 6, message: "Password must be at least 6 characters" },
+                })}
+                className={`w-full pl-3 pr-3 py-2.5 text-sm rounded border ${
+                  errors.password ? "border-red-500" : "border-slate-200"
+                } focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
+                placeholder="Enter new password"
+              />
+              {errors.password && (
+                <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>
+              )}
+              {passwordValue && !errors.password && (
+                <p className="mt-1 text-xs text-green-500">
+                  Password strength:{" "}
+                  {passwordValue.length < 6
+                    ? "Weak"
+                    : passwordValue.length < 10
+                    ? "Medium"
+                    : "Strong"}
+                </p>
+              )}
+            </div>
+
+            {/* Retype Password */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="retypePassword">
+                Re-type Password
+              </label>
+              <input
+                type="password"
+                {...register("retypePassword")}
+                className={`w-full pl-3 pr-3 py-2.5 text-sm rounded border border-slate-200 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
+                placeholder="Re-enter password"
+              />
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="email">
+                Email
+              </label>
+              <input
+                type="email"
+                {...register("email", {
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "Invalid email address",
+                  },
+                })}
+                className={`w-full pl-3 pr-3 py-2.5 text-sm rounded border ${
+                  errors.email ? "border-red-500" : "border-slate-200"
+                } focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
+                placeholder="Enter email"
+              />
+              {errors.email && (
+                <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>
+              )}
+            </div>
+
+            {/* Phone */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="phone">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                {...register("phone", {
+                  pattern: { value: /^[\d\s\-()+]+$/, message: "Invalid phone number" },
+                })}
+                className={`w-full pl-3 pr-3 py-2.5 text-sm rounded border ${
+                  errors.phone ? "border-red-500" : "border-slate-200"
+                } focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
+                placeholder="Enter phone number"
+              />
+              {errors.phone && (
+                <p className="mt-1 text-xs text-red-500">{errors.phone.message}</p>
+              )}
+            </div>
+
+            {/* Address */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="address">
                 Address
               </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-3 flex items-center text-slate-400">
-                  <i className="fas fa-map-marker-alt text-sm"></i>
-                </span>
-                <input
-                  className={`w-full pl-9 pr-3 py-2.5 text-sm rounded border ${errors.address ? "border-red-500" : "border-slate-200"
-                    } placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
-                  id="address"
-                  name="address"
-                  placeholder="Enter address"
-                  type="text"
-                  value={formData.address}
-                  onChange={handleChange}
-                />
-              </div>
-              {errors.address && (
-                <p className="mt-1 text-xs text-red-500">{errors.address}</p>
-              )}
+              <input
+                {...register("address")}
+                className="w-full pl-3 pr-3 py-2.5 text-sm rounded border border-slate-200 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400"
+                placeholder="Enter address"
+              />
             </div>
           </div>
 
-          {/* Submit button */}
           <button
             className="mt-8 w-full bg-slate-900 text-white text-sm font-semibold rounded py-2.5 hover:bg-slate-800 transition"
             type="submit"
