@@ -54,8 +54,8 @@ const ExportHistory: React.FC = () => {
 
   return (
     <div className="w-full rounded-md flex flex-col p-5 min-h-full">
-      <div className="max-w-7xl mx-auto">
-        <div className="bg-white rounded-md px-2">
+      <div className="min-w-[1200px] mx-auto">
+      <div className="bg-white rounded-md px-2">
           <h1 className='text-xl font-semibold'>EXPORT HISTORY</h1>
           <form className="bg-white rounded-md p-4 sm:p-6 mb-6 space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-x-6">
             <div>
