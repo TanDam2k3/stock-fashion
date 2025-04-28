@@ -1,5 +1,6 @@
 const stockTransactionModel = require('../models/StockTransaction');
 const httpErrorService = require('./httpErrorService');
+const productService = require('./productService');
 
 const create = async (payload) => {
   try {
@@ -13,7 +14,11 @@ const create = async (payload) => {
       quantity: payload?.quantity,
       price: payload?.price || 0
     };
-    const transaction = await stockTransactionModel.create(data);
+    const [transaction, isUpdatedProduct] = await Promise.all([
+      stockTransactionModel.create(data),
+      productService.updatedProduct({ _id: data.productId, quantity: data.quantity })
+    ]);
+    console.log('isUpdatedProduct', isUpdatedProduct);
     return transaction;
   } catch (e) {
     await httpErrorService.create(e, 'Create stock transaction Service');
