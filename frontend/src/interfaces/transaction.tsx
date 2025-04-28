@@ -20,4 +20,6 @@ export interface ISearchTransaction {
     userId?: string;
     type?: string;
     status?: string;
+    fromDate?: Date | null;
+    toDate?: Date | null;
 }

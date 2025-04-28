@@ -29,6 +29,7 @@ const create = async (payload) => {
 
 const getList = async (query) => {
   try {
+    if (!query.userId) return [];
     const data = await productModel.find(query).lean();
     if (!data?.length) return [];
 

@@ -1,19 +1,15 @@
 import React from "react";
-import { ITransaction } from "../../interfaces"; 
+import { ITransaction } from "../../interfaces";
 
 interface ProductDetailPopupProps {
-  product: ITransaction;
+  transaction: ITransaction;
   onClose: () => void;
 }
 
 const ProductDetailPopup: React.FC<ProductDetailPopupProps> = ({
-  product,
+  transaction,
   onClose,
 }) => {
-  const formattedDate = product.createdAt 
-    ? new Date(product.createdAt).toLocaleDateString('en-GB') 
-    : '';
-
   return (
     <div className="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-60 z-50 transition-all ease-in-out">
       <div className="bg-white p-6 rounded-lg shadow-lg w-[600px] transform transition-transform duration-300 scale-95 hover:scale-100">
@@ -27,7 +23,7 @@ const ProductDetailPopup: React.FC<ProductDetailPopupProps> = ({
               <label className="block text-sm font-medium text-gray-700">Mã phiếu</label>
               <input
                 type="text"
-                value={product._id}
+                value={transaction._id}
                 readOnly
                 className="w-full px-4 py-2 border rounded-md bg-gray-100 focus:outline-none"
               />
@@ -37,7 +33,7 @@ const ProductDetailPopup: React.FC<ProductDetailPopupProps> = ({
               <label className="block text-sm font-medium text-gray-700">Ngày xuất kho</label>
               <input
                 type="text"
-                value={formattedDate}
+                value={`${transaction?.createdAt ? new Date(transaction.createdAt).getDate() : ''}`}
                 readOnly
                 className="w-full px-4 py-2 border rounded-md bg-gray-100 focus:outline-none"
               />
@@ -47,7 +43,7 @@ const ProductDetailPopup: React.FC<ProductDetailPopupProps> = ({
               <label className="block text-sm font-medium text-gray-700">Tên sản phẩm</label>
               <input
                 type="text"
-                value={product.productName || ''}
+                value={transaction?.productName || ''}
                 readOnly
                 className="w-full px-4 py-2 border rounded-md bg-gray-100 focus:outline-none"
               />
@@ -57,7 +53,7 @@ const ProductDetailPopup: React.FC<ProductDetailPopupProps> = ({
               <label className="block text-sm font-medium text-gray-700">Số lượng</label>
               <input
                 type="number"
-                value={product.quantity ?? 0}
+                value={transaction?.quantity || 0}
                 readOnly
                 className="w-full px-4 py-2 border rounded-md bg-gray-100 focus:outline-none"
               />
@@ -67,26 +63,24 @@ const ProductDetailPopup: React.FC<ProductDetailPopupProps> = ({
               <label className="block text-sm font-medium text-gray-700">Tên người thực hiện</label>
               <input
                 type="text"
-                value={product.userName || ''}
+                value={transaction?.userName || ''}
                 readOnly
                 className="w-full px-4 py-2 border rounded-md bg-gray-100 focus:outline-none"
               />
             </div>
           </div>
-
           <div className="mb-4 w-1/3">
-            <label className="block text-sm font-medium text-gray-700">Ảnh sản phẩm</label>
             <div className="w-full h-56 flex justify-center items-center bg-gray-100 rounded-md">
               <img
-                src={product.imageUrl || '/default-image.png'}
-                alt={product.productName || 'Ảnh sản phẩm'}
+                src={transaction?.imageUrl || ''}
+                alt={transaction?.productName || ''}
                 className="object-contain max-h-full max-w-full"
               />
             </div>
           </div>
         </div>
 
-        <div className="flex justify-between gap-4 mt-4">
+        <div className="flex justify-between gap-4">
           <button
             type="button"
             onClick={onClose}

@@ -29,7 +29,27 @@ const create = async (payload) => {
 
 const getTransactions = async (query) => {
   try {
-    const data = await stockTransactionModel.find(query).lean();
+    if (!query.userId) return [];
+    const { fromDate, toDate, ...payload } = query;
+    const data = await stockTransactionModel.find({
+      ...payload,
+      ...(fromDate && toDate && {
+        createdAt: {
+          $gte: fromDate,
+          $lte: toDate
+        }
+      }),
+      ...(fromDate && !toDate && {
+        createdAt: {
+          $gte: fromDate
+        }
+      }),
+      ...(!fromDate && toDate && {
+        createdAt: {
+          $lte: toDate
+        }
+      })
+    }).lean();
     if (!data?.length) return [];
     const productIds = data.map((d) => d?.productId);
     const housewareIds = data.map((d) => d?.housewareId);
@@ -46,7 +66,7 @@ const getTransactions = async (query) => {
         imageUrl: product?.imageUrl || '',
         housewareName: houseware?.name || '',
         productName: product?.name || '',
-        userName: user.name
+        userName: user?.username || ''
       };
     });
     return dataResponse;

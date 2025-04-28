@@ -31,7 +31,9 @@ class ImportProductService {
             const payload = {
                 ...(filters?.userId && { userId: filters.userId }),
                 ...(filters?.type && { type: filters.type }),
-                ...(filters?.status && { status: filters.status })
+                ...(filters?.status && { status: filters.status }),
+                ...(filters?.fromDate && { fromDate: filters.fromDate }),
+                ...(filters?.toDate && { toDate: filters.toDate })
             }
             const TOKEN = Cookies.get('token') || null;
 
@@ -46,7 +48,7 @@ class ImportProductService {
             );
             return response.data;
         } catch (error) {
-            console.error("Failed to create product:", error);
+            console.error("Get list transaction import fail:", error);
             throw error;
         }
     }

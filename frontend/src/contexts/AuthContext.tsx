@@ -40,7 +40,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
                     ...user
                 }
                 setUser(userDetil);
-                setUser(decoded);
             }
         };
         authContext();

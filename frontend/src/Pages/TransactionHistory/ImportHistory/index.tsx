@@ -1,36 +1,40 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
+
 import React, { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaEye } from 'react-icons/fa';
 import ProductDetailPopup from '../../../components/transaction-history/edit-popup';
 import { ITransaction } from '../../../interfaces';
-import {  importProductService } from '../../../services';
+import { importProductService } from '../../../services';
 import { AuthContext } from '../../../contexts/AuthContext';
+
+type FilterType = {
+  type: string;
+  status: string;
+  fromDate: Date | null;
+  toDate: Date | null;
+};
 
 const ImportHistory: React.FC = () => {
   const { user } = useContext(AuthContext);
   const [transactionImport, setTransactionImport] = useState<ITransaction[]>([]);
-  const [filter] = useState({
+  const [filter, setFilter] = useState<FilterType>({
     type: 'import',
     status: 'success',
     fromDate: null,
     toDate: null
   });
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<ITransaction | null>(null);
-
-
+  const [selectTransaction, setSelectTransaction] = useState<ITransaction | null>(null);
   const { register } = useForm<ITransaction>();
 
-
   const handleViewDetail = (product: ITransaction) => {
-    setSelectedProduct(product);
+    setSelectTransaction(product);
     setIsPopupOpen(true);
   };
 
   const handleClosePopup = () => {
     setIsPopupOpen(false);
-    setSelectedProduct(null);
+    setSelectTransaction(null);
   };
 
   const getTransaction = async () => {
@@ -39,17 +43,17 @@ const ImportHistory: React.FC = () => {
       userId: user?._id
     });
     console.log('transaction', transaction)
-    transaction?.length && setTransactionImport(transaction);
+
+    setTransactionImport(transaction);
   }
 
   useEffect(() => {
     getTransaction();
-  }, [filter]);
+  }, [filter, user]);
 
   return (
     <div className="w-full rounded-md flex flex-col p-5 min-h-full">
       <div className="min-w-[1200px] mx-auto">
-        {/* Bộ lọc khoảng ngày */}
         <div className="bg-white rounded-md px-2">
           <h1 className='text-xl font-semibold'>IMPORT HISTORY</h1>
           <form className="bg-white rounded-md p-4 sm:p-6 mb-6 space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-x-6">
@@ -61,6 +65,7 @@ const ImportHistory: React.FC = () => {
                 <input
                   id="from-date"
                   type="date"
+                  onChange={(value) => setFilter({ ...filter, fromDate: new Date(value.target.value) })}
                   className="w-full border border-[#E5E7EB] rounded-md bg-white text-xs sm:text-sm text-[#6B7280] py-2 px-3 pl-9"
                 />
                 <i className="fas fa-calendar-alt absolute left-3 top-1/2 -translate-y-1/2 text-[#6B7280] text-sm pointer-events-none"></i>
@@ -75,6 +80,7 @@ const ImportHistory: React.FC = () => {
                 <input
                   id="to-date"
                   type="date"
+                  onChange={(value) => setFilter({ ...filter, toDate: new Date(value.target.value) })}
                   className="w-full border border-[#E5E7EB] rounded-md bg-white text-xs sm:text-sm text-[#6B7280] py-2 px-3 pl-9"
                 />
                 <i className="fas fa-calendar-alt absolute left-3 top-1/2 -translate-y-1/2 text-[#6B7280] text-sm pointer-events-none"></i>
@@ -110,6 +116,7 @@ const ImportHistory: React.FC = () => {
                       {...register('_id')}
                       readOnly
                       className="w-full border rounded px-2 py-1 bg-[#F9FAFB] cursor-not-allowed text-center"
+                      value={transaction._id}
                     />
                   </td>
                   <td className="border border-[#E5E7EB] p-1">
@@ -117,6 +124,7 @@ const ImportHistory: React.FC = () => {
                       {...register('housewareName')}
                       readOnly
                       className="w-full border rounded px-2 py-1 bg-[#F9FAFB] cursor-not-allowed text-center"
+                      value={transaction?.housewareName || ''}
                     />
                   </td>
                   <td className="border border-[#E5E7EB] p-1">
@@ -124,6 +132,7 @@ const ImportHistory: React.FC = () => {
                       {...register('productName')}
                       readOnly
                       className="w-full border rounded px-2 py-1 bg-[#F9FAFB] cursor-not-allowed text-center"
+                      value={transaction?.productName || ''}
                     />
                   </td>
                   <td className="border border-[#E5E7EB] p-1">
@@ -132,6 +141,7 @@ const ImportHistory: React.FC = () => {
                       {...register('quantity', { valueAsNumber: true })}
                       readOnly
                       className="w-full border rounded px-2 py-1 bg-[#F9FAFB] cursor-not-allowed text-center"
+                      value={transaction?.quantity || 0}
                     />
                   </td>
                   <td className="border border-[#E5E7EB] p-1">
@@ -139,6 +149,7 @@ const ImportHistory: React.FC = () => {
                       {...register('userName')}
                       readOnly
                       className="w-full border rounded px-2 py-1 bg-[#F9FAFB] cursor-not-allowed text-center"
+                      value={transaction?.userName || ''}
                     />
                   </td>
                   <td className="border border-[#E5E7EB] p-1">
@@ -158,8 +169,8 @@ const ImportHistory: React.FC = () => {
       </div>
 
       {/* Show Product Detail Popup */}
-      {isPopupOpen && selectedProduct && (
-        <ProductDetailPopup product={selectedProduct} onClose={handleClosePopup} />
+      {isPopupOpen && selectTransaction && (
+        <ProductDetailPopup transaction={selectTransaction} onClose={handleClosePopup} />
       )}
     </div>
   );
