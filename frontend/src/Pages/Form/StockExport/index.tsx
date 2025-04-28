@@ -1,74 +1,61 @@
-import React, { useEffect, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import React, { useContext, useEffect, useState } from "react";
+import { SubmitHandler, useForm, useWatch } from "react-hook-form";
+import { housewareService, productService } from "../../../services";
+import { AuthContext } from "../../../contexts/AuthContext";
+import { Product } from "../../../interfaces";
 // import { AuthContext } from "../../../contexts/AuthContext";
 
 type Inputs = {
-  stockId: string;
+  productId: string;
   housewareId: string;
   quantity: number;
 };
 
 const ExportStock: React.FC = () => {
-  const { register, handleSubmit, watch, setError, clearErrors } = useForm<Inputs>();
-  // const { user } = useContext(AuthContext);
+  const { register, handleSubmit, control } = useForm<Inputs>();
+  const { user } = useContext(AuthContext);
 
-  const [stocks, setStocks] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [housewares, setHousewares] = useState<any[]>([]);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [showFullImage, setShowFullImage] = useState<boolean>(false);
 
-  const selectedStockId = watch("stockId");
-  const selectedHousewareId = watch("housewareId");
-  const enteredQuantity = watch("quantity");
+  const onChangeHouseware = useWatch({ control, name: 'housewareId' });
+    const onChangeProduct = useWatch({ control, name: 'productId' });
+  
 
-  useEffect(() => {
-    setStocks([
-      { _id: "stock1", name: "Warehouse A", quantity: 5 },
-      { _id: "stock2", name: "Warehouse B", quantity: 10 },
-      { _id: "stock3", name: "Warehouse C", quantity: 15 },
-    ]);
-
-    setHousewares([
-      {
-        _id: "houseware1",
-        name: "Chair",
-        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHl26di3vjeFb0yJuSQDL07pp59vvTX9Xc-w&s",
-      },
-      {
-        _id: "houseware2",
-        name: "Table",
-        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrs0z28TzfJIReTwwvfDhaOl74Y60pmAFvWQ&s",
-      },
-      {
-        _id: "houseware3",
-        name: "Lamp",
-        image: "https://toquoc.mediacdn.vn/2019/4/26/photo-6-15562650321071954349801.jpg",
-      },
-    ]);
-  }, []);
-
-  useEffect(() => {
-    if (selectedHousewareId) {
-      const selected = housewares.find((item) => item._id === selectedHousewareId);
-      if (selected?.image) {
-        setImagePreview(selected.image);
+    const getListHouseware = async () => {
+      try {
+        const houseware = await housewareService.getListHouseware({ status: 'active', userId: user?._id });
+        setHousewares(houseware);
+      } catch (error) {
+        console.error('Error fetching houseware list:', error);
       }
-    }
-  }, [selectedHousewareId, housewares]);
+    };
+      useEffect(() => {
+        getListHouseware();
+      }, []);
 
-  useEffect(() => {
-    if (selectedStockId && enteredQuantity !== undefined) {
-      const stock = stocks.find((s) => s._id === selectedStockId);
-      if (stock && enteredQuantity > stock.quantity) {
-        setError("quantity", {
-          type: "manual",
-          message: `Quantity cannot exceed available stock (${stock.quantity})`,
-        });
-      } else {
-        clearErrors("quantity");
-      }
-    }
-  }, [selectedStockId, enteredQuantity, stocks, setError, clearErrors]);
+
+        const getList = async () => {
+          try {
+            const response = await productService.getList({ housewareId: onChangeHouseware, userId: user?._id });
+            response?.length && setProducts(response);
+          } catch (error) {
+            console.error('Failed to fetch products', error);
+          }
+        }
+          useEffect(() => {
+            getList();
+          }, [onChangeHouseware]);
+          
+
+            useEffect(() => {
+              if (onChangeProduct) {
+                const product = products.find(p => `${p._id}` === `${onChangeProduct}`);
+                product?.imageUrl && setImagePreview(product.imageUrl);
+              }
+            }, [onChangeProduct]);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     console.log("Export data:", data);
@@ -91,19 +78,19 @@ const ExportStock: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Left: Form */}
           <div className="flex flex-col gap-6 justify-center">
-            <div>
+          <div>
               <label htmlFor="stockId" className="block text-sm font-semibold text-black mb-1">
-                Select Stock
+                Select Product
               </label>
               <select
-                id="stockId"
+                id="productId"
                 className="w-full rounded-md border px-4 py-2"
-                {...register("stockId", { required: true })}
+                {...register("productId", { required: true })}
               >
-                <option value="">Select stock</option>
-                {stocks.map((stock) => (
-                  <option key={stock._id} value={stock._id}>
-                    {stock.name}
+                <option value="">Select Product</option>
+                {products.map((item) => (
+                  <option key={item._id} value={item._id}>
+                    {item.name}
                   </option>
                 ))}
               </select>
