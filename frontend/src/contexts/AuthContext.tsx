@@ -47,9 +47,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }, []);
 
     const logout = () => {
+        const confirm = window.confirm('Bạn có muốn đăng xuất không?');
+        if (!confirm) return;
         setToken(null);
         setUser(null);
         document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+        window.location.reload();
     };
 
     return (
