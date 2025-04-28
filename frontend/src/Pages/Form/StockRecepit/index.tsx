@@ -60,7 +60,7 @@ const ImportStock: React.FC = () => {
   };
 
   return (
-    <div className="w-full rounded-md bg-white flex flex-col p-5 ">
+    <div className="w-full rounded-md bg-white flex flex-col p-5 min-h-full ">
       <form
         className="w-full"
         onSubmit={handleSubmit(onSubmit)}
@@ -68,13 +68,13 @@ const ImportStock: React.FC = () => {
         noValidate
       >
         <h2 className="text-black text-xl font-semibold mb-6">
-          Import Houseware
+          Import product
         </h2>
 
         {/* 2 Cột */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Left: Form */}
-          <div className="flex flex-col gap-6 md:col-span-2">
+          <div className="flex flex-col gap-6 justify-center">
             <div>
               <label htmlFor="stockId" className="block text-sm font-semibold text-black mb-1">
                 Select Stock
@@ -134,11 +134,11 @@ const ImportStock: React.FC = () => {
           <div className="flex flex-col items-center justify-center relative">
             {imagePreview ? (
               <>
-                  <h1 className="font-semibold">Image</h1>
+                  <h1 className="font-semibold text-lg text-primary">Prevew</h1>
                 <img
                   src={imagePreview}
                   alt="Preview"
-                  className="w-40 h-40 object-cover rounded-full border cursor-pointer"
+                  className="w-100 h-96 object-cover  cursor-pointer"
                   onClick={() => setShowFullImage(true)}
                 />
                 {/* Full screen image modal */}
@@ -156,7 +156,7 @@ const ImportStock: React.FC = () => {
                 )}
               </>
             ) : (
-              <div className="w-40 h-40 flex items-center justify-center border rounded-full text-gray-400">
+              <div className="w-40 h-40 flex items-center justify-center border text-gray-400">
                 No Image
               </div>
             )}

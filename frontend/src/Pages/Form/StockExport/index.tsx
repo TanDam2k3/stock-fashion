@@ -76,18 +76,21 @@ const ExportStock: React.FC = () => {
   };
 
   return (
-    <div className="w-full rounded-md bg-white flex flex-col p-5 ">
+    <div className="w-full rounded-md bg-white flex flex-col p-5 min-h-full ">
       <form
         className="w-full"
         onSubmit={handleSubmit(onSubmit)}
         autoComplete="off"
         noValidate
       >
-        <h2 className="text-black text-xl font-semibold mb-6">Export Stock</h2>
+        <h2 className="text-black text-xl font-semibold mb-6">
+          Export product
+        </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* 2 Cột */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Left: Form */}
-          <div className="flex flex-col gap-6 md:col-span-2">
+          <div className="flex flex-col gap-6 justify-center">
             <div>
               <label htmlFor="stockId" className="block text-sm font-semibold text-black mb-1">
                 Select Stock
@@ -132,7 +135,6 @@ const ExportStock: React.FC = () => {
                 id="quantity"
                 type="number"
                 min={1}
-                step={1}
                 placeholder="Enter quantity"
                 className="w-full rounded-md border px-4 py-2"
                 {...register("quantity", { required: true, min: 1 })}
@@ -140,20 +142,22 @@ const ExportStock: React.FC = () => {
             </div>
 
             <button type="submit" className="bg-[#0a162c] text-white py-3 rounded-md">
-              Export
+              Import
             </button>
           </div>
 
           {/* Right: Image */}
-          <div className="flex items-center justify-center relative">
+          <div className="flex flex-col items-center justify-center relative">
             {imagePreview ? (
               <>
+                  <h1 className="font-semibold text-lg  mb-3">Image product </h1>
                 <img
                   src={imagePreview}
                   alt="Preview"
-                  className="w-40 h-40 object-cover rounded-full border cursor-pointer"
+                  className="w-100 h-96 object-cover  cursor-pointer"
                   onClick={() => setShowFullImage(true)}
                 />
+                {/* Full screen image modal */}
                 {showFullImage && (
                   <div
                     className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
@@ -168,7 +172,7 @@ const ExportStock: React.FC = () => {
                 )}
               </>
             ) : (
-              <div className="w-40 h-40 flex items-center justify-center border rounded-full text-gray-400">
+              <div className="w-40 h-40 flex items-center justify-center border text-gray-400">
                 No Image
               </div>
             )}
