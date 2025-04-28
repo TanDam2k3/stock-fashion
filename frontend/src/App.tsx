@@ -15,6 +15,8 @@ import Settings from "./Pages/Setting";
 import EmployeeManagement from "./Pages/ManageEmployee";
 import CreateEmployee from "./Pages/ManageEmployee/create";
 import { AuthProvider } from "./contexts/AuthContext";
+import ImportStock from "./Pages/Form/StockRecepit";
+import ExportStock from "./Pages/Form/StockExport";
 
 const App = () => {
   return (
@@ -37,6 +39,8 @@ const App = () => {
               <Route path="settings" element={<Settings />} />
               <Route path="employees" element={<EmployeeManagement />} />
               <Route path="employees/create" element={<CreateEmployee />} />
+              <Route path="import" element={<ImportStock />} />
+              <Route path="export" element={<ExportStock />} />
 
 
 

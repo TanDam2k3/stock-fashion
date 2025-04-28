@@ -6,6 +6,7 @@ import {
   FaUserFriends,
   FaCogs,
   FaChartLine,
+  FaFileExport,
 } from "react-icons/fa";
 import { TbLogout2 } from "react-icons/tb";
 import {
@@ -111,6 +112,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
           {menuItem(<FaBoxes />, "Kho hàng", "stocks")}
 
           {menuItem(<GiClothes />, "Sản phẩm", "products")}
+          {menuItem(<FaFileExport/>, "Nhập kho", "import")}
+          {menuItem(<FaFileExport   />, "Xuất kho", "export")}
 
           {/* Phiếu báo cáo */}
           {menuItem(<FaChartLine />, "Lịch sử giao dịch", undefined, () =>
