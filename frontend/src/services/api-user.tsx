@@ -86,6 +86,26 @@ class UserService {
             return { success: false };
         }
     };
+
+    public async findDetail(_id: string) {
+        try {
+            const TOKEN = Cookies.get('token') || null;
+
+            const response = await axios.get(
+                `${API_END_POINT}/api/user/find-detail`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${TOKEN}`
+                    },
+                    params: { _id: _id }
+                }
+            );
+            return response.data;
+        } catch (error) {
+            console.error("Finde detail user fail:", error);
+            throw error;
+        }
+    }
 }
 
 export const userService = new UserService();

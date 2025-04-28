@@ -2,6 +2,7 @@ import { createContext, useState, useEffect, ReactNode } from "react";
 import { jwtDecode } from "jwt-decode";
 import Cookies from 'js-cookie';
 import { IUser } from "../interfaces";
+import { userService } from "../services";
 
 interface AuthContextType {
     user: IUser | null;
@@ -28,12 +29,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const [token, setToken] = useState<string | null>(null);
 
     useEffect(() => {
-        const savedToken = Cookies.get('token');
-        if (savedToken) {
-            setToken(savedToken);
-            const decoded = jwtDecode<IUser>(savedToken);
-            setUser(decoded);
-        }
+        const authContext = async () => {
+            const savedToken = Cookies.get('token');
+            if (savedToken) {
+                setToken(savedToken);
+                const decoded = jwtDecode<IUser>(savedToken);
+                const user = await userService.findDetail(decoded._id);
+                const userDetil = {
+                    ...decoded,
+                    ...user
+                }
+                setUser(userDetil);
+                setUser(decoded);
+            }
+        };
+        authContext();
     }, []);
 
     const logout = () => {
@@ -43,8 +53,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, setUser, token, setToken, logout }
-        }>
+        <AuthContext.Provider value={{ user, setUser, token, setToken, logout }}>
             {children}
         </AuthContext.Provider>
     );

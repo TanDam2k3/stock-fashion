@@ -1,6 +1,8 @@
 import React, { useState, useRef, ChangeEvent } from "react";
 
 const Settings = () => {
+  // const { user } = useContext(AuthContext);
+
   const [formData, setFormData] = useState({
     username: "",
     displayname: "",
@@ -166,33 +168,14 @@ const Settings = () => {
 
           {/* Form fields */}
           <div className="space-y-6">
-          <div>
-              <div className="">
-              <label
-                  className="block text-sm font-medium text-slate-700 mb-1"
-                  htmlFor="role"
-                >
-                  Role
-                </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-3 flex items-center text-slate-400">
-                    <i className="fas fa-user text-sm"></i>
-                  </span>
-                  <input
-                    className={`w-1/6 pl-9 pr-3 py-2.5 text-sm rounded border `}
-                    id="role"
-                    name="role"
-                   disabled
-                  />
-                </div>
-              </div>
-                {errors.username && (
-                  <p className="mt-1 text-xs text-red-500">{errors.username}</p>
-                )}
-              </div>
+            <div>
+              {errors.username && (
+                <p className="mt-1 text-xs text-red-500">{errors.username}</p>
+              )}
+            </div>
             {/* Username and Display Name row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
+
               <div>
                 <label
                   className="block text-sm font-medium text-slate-700 mb-1"
@@ -205,9 +188,8 @@ const Settings = () => {
                     <i className="fas fa-user text-sm"></i>
                   </span>
                   <input
-                    className={`w-full pl-9 pr-3 py-2.5 text-sm rounded border ${
-                      errors.username ? "border-red-500" : "border-slate-200"
-                    } placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
+                    className={`w-full pl-9 pr-3 py-2.5 text-sm rounded border ${errors.username ? "border-red-500" : "border-slate-200"
+                      } placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
                     id="username"
                     name="username"
                     placeholder="Enter username"
@@ -233,9 +215,8 @@ const Settings = () => {
                     <i className="fas fa-pencil-alt text-sm"></i>
                   </span>
                   <input
-                    className={`w-full pl-9 pr-3 py-2.5 text-sm rounded border ${
-                      errors.displayname ? "border-red-500" : "border-slate-200"
-                    } placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
+                    className={`w-full pl-9 pr-3 py-2.5 text-sm rounded border ${errors.displayname ? "border-red-500" : "border-slate-200"
+                      } placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
                     id="displayname"
                     name="displayname"
                     placeholder="Enter display name"
@@ -266,9 +247,8 @@ const Settings = () => {
                     <i className="fas fa-lock text-sm"></i>
                   </span>
                   <input
-                    className={`w-full pl-9 pr-3 py-2.5 text-sm rounded border ${
-                      errors.password ? "border-red-500" : "border-slate-200"
-                    } placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
+                    className={`w-full pl-9 pr-3 py-2.5 text-sm rounded border ${errors.password ? "border-red-500" : "border-slate-200"
+                      } placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
                     id="password"
                     name="password"
                     placeholder="Enter new password"
@@ -286,8 +266,8 @@ const Settings = () => {
                     {formData.password.length < 6
                       ? "Weak"
                       : formData.password.length < 10
-                      ? "Medium"
-                      : "Strong"}
+                        ? "Medium"
+                        : "Strong"}
                   </p>
                 )}
               </div>
@@ -304,9 +284,8 @@ const Settings = () => {
                     <i className="fas fa-lock text-sm"></i>
                   </span>
                   <input
-                    className={`w-full pl-9 pr-3 py-2.5 text-sm rounded border ${
-                      errors.retypePassword ? "border-red-500" : "border-slate-200"
-                    } placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
+                    className={`w-full pl-9 pr-3 py-2.5 text-sm rounded border ${errors.retypePassword ? "border-red-500" : "border-slate-200"
+                      } placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
                     id="retypePassword"
                     name="retypePassword"
                     placeholder="Re-enter password"
@@ -337,9 +316,8 @@ const Settings = () => {
                     <i className="fas fa-envelope text-sm"></i>
                   </span>
                   <input
-                    className={`w-full pl-9 pr-3 py-2.5 text-sm rounded border ${
-                      errors.email ? "border-red-500" : "border-slate-200"
-                    } placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
+                    className={`w-full pl-9 pr-3 py-2.5 text-sm rounded border ${errors.email ? "border-red-500" : "border-slate-200"
+                      } placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
                     id="email"
                     name="email"
                     placeholder="Enter email"
@@ -365,9 +343,8 @@ const Settings = () => {
                     <i className="fas fa-phone text-sm"></i>
                   </span>
                   <input
-                    className={`w-full pl-9 pr-3 py-2.5 text-sm rounded border ${
-                      errors.phone ? "border-red-500" : "border-slate-200"
-                    } placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
+                    className={`w-full pl-9 pr-3 py-2.5 text-sm rounded border ${errors.phone ? "border-red-500" : "border-slate-200"
+                      } placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
                     id="phone"
                     name="phone"
                     placeholder="Enter phone number"
@@ -395,9 +372,8 @@ const Settings = () => {
                   <i className="fas fa-map-marker-alt text-sm"></i>
                 </span>
                 <input
-                  className={`w-full pl-9 pr-3 py-2.5 text-sm rounded border ${
-                    errors.address ? "border-red-500" : "border-slate-200"
-                  } placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
+                  className={`w-full pl-9 pr-3 py-2.5 text-sm rounded border ${errors.address ? "border-red-500" : "border-slate-200"
+                    } placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400`}
                   id="address"
                   name="address"
                   placeholder="Enter address"

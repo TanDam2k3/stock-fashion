@@ -113,8 +113,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
           {menuItem(<FaBoxes />, "Kho hàng", "stocks")}
 
           {menuItem(<GiClothes />, "Sản phẩm", "products")}
-          {menuItem(<FaFileExport/>, "Nhập kho", "import")}
-          {menuItem(<FaFileExport   />, "Xuất kho", "export")}
+          {menuItem(<FaFileExport />, "Nhập kho", "import")}
+          {menuItem(<FaFileExport />, "Xuất kho", "export")}
 
           {/* Phiếu báo cáo */}
           {menuItem(<FaChartLine />, "Lịch sử giao dịch", undefined, () =>
@@ -127,9 +127,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             </ul>
           )}
 
-          {menuItem(<FaCogs />, "Setting", "settings")}
           {user && user.role === 'admin' && (
             <>
+              {menuItem(<FaCogs />, "Setting", "settings")}
               {menuItem(<FaUserFriends />, "Nhân sự", undefined, () =>
                 toggleDropdown("employee"), true, "employee"
               )}
