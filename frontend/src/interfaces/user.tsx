@@ -8,6 +8,7 @@ export interface IUser {
     email?: string;
     address?: string;
     avatar?: string;
+    password?: string;
     iat?: number;
     exp?: number;
 }
@@ -36,4 +37,15 @@ export interface IEmployee {
     email?: string;
     address?: string;
     avatar?: string;
+}
+
+export interface IUserUpdate {
+    _id?: string;
+    username?: string;
+    name?: string;
+    password?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    avatarId?: string;
 }

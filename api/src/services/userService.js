@@ -41,7 +41,9 @@ const getDetail = async (query) => {
       ...(file && { avatar: `${process.env.DOMAIN}/${file.fileUrl}` })
     };
 
-    return dataRespont;
+    const { password, ...response } = dataRespont;
+
+    return response;
   } catch (e) {
     await httpErrorService.create({ error: e, localtion: 'Finde detail user fail Service' });
     return null;
@@ -51,15 +53,23 @@ const getDetail = async (query) => {
 const update = async (payload) => {
   try {
     if (!payload || !payload?._id) return null;
+    const { _id, ...newDate } = payload;
+
+    const rawPassword = newDate?.password && await decryptPassword(newDate?.password);
+    const hashed = rawPassword && await hashPassword(rawPassword);
+
     const dataUpdate = {
-      ...(payload?.name && { name: payload.name }),
-      ...(payload?.address && { address: payload.address }),
-      ...(payload?.phone && { phone: payload.phone }),
-      ...(payload?.email && { email: payload.email })
+      ...(newDate?.username && { username: newDate.username }),
+      ...(newDate?.name && { name: newDate.name }),
+      ...(newDate?.password && { password: hashed }),
+      ...(newDate?.address && { address: newDate.address }),
+      ...(newDate?.phone && { phone: newDate.phone }),
+      ...(newDate?.email && { email: newDate.email }),
+      ...(newDate?.avatarId && { avatarId: newDate.avatarId })
     };
     const updatedUser = await userModel.findOneAndUpdate(
       {
-        _id: new ObjectId(payload._id)
+        _id: new ObjectId(_id)
       },
       {
         $set: {
@@ -73,7 +83,7 @@ const update = async (payload) => {
     );
     return updatedUser;
   } catch (e) {
-    await httpErrorService.create({ error: e, localtion: 'Update user from admin fail Service' });
+    await httpErrorService.create({ error: e, localtion: 'Update user fail Service' });
     return null;
   }
 };

@@ -35,10 +35,17 @@ const ProductList: React.FC = () => {
 
   const getList = async () => {
     try {
-      const response = await productService.getList({ ...filters, userId: user?._id });
-      response?.length && setProducts(response);
+      const response = await productService.getList({
+        ...filters,
+        userId: user?._id
+      });
+      setProducts(response || []);
+            if (filters.type && response?.length === 0) {
+      }
     } catch (error) {
-      console.error('Failed to fetch products', error);
+      setProducts([]);
+    } finally {
+   
     }
   }
 

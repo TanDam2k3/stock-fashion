@@ -53,12 +53,11 @@ const ExportHistory: React.FC = () => {
   }, [filter, user]);
 
   return (
-    <div className="w-full min-h-screen p-5 flex flex-col bg-gray-50 overflow-y-auto">
-      <div className="max-w-7xl mx-auto w-full">
-        {/* Header Form Filter */}
-        <div className="bg-white rounded-md p-4 mb-6">
-          <h1 className="text-xl font-semibold mb-4">EXPORT HISTORY</h1>
-          <form className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="w-full rounded-md flex flex-col p-5 min-h-full">
+      <div className="min-w-[1200px] mx-auto">
+      <div className="bg-white rounded-md px-2">
+          <h1 className='text-xl font-semibold'>EXPORT HISTORY</h1>
+          <form className="bg-white rounded-md p-4 sm:p-6 mb-6 space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-x-6">
             <div>
               <label htmlFor="from-date" className="block text-sm font-medium text-gray-700 mb-1">
                 Từ ngày
