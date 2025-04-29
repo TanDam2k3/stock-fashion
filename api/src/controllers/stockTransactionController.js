@@ -27,7 +27,7 @@ exports.exportStock = async (req, res) => {
 
 exports.getTransactions = async (req, res) => {
   try {
-    const transactions = await stockTransactionService.getTransactions(req?.query);
+    const transactions = await stockTransactionService.getTransactions(req?.query, req?.user);
     res.status(200).json(transactions);
   } catch (e) {
     await httpErrorService.create(e, 'Get list transaction');

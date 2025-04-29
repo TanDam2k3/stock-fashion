@@ -38,7 +38,7 @@ const ExportHistory: React.FC = () => {
   const getTransaction = async () => {
     const transaction = await exportProductService.getList({
       ...filter,
-      userId: user?._id
+      ...(user?.role !== 'admin' && {userId: user?._id}) 
     });
     setTransactionExport(transaction);
   }

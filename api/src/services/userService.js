@@ -50,6 +50,34 @@ const getDetail = async (query) => {
   }
 };
 
+const findDetailByIds = async (userIds) => {
+  try {
+    if (!userIds?.length) return null;
+    const users = await userModel.find({
+      _id: { $in: userIds }
+    }).lean();
+
+    if (!users?.length) return [];
+
+    const fileIds = users.map((u) => u.avatarId);
+
+    const files = await fileService.getList({ _id: { $in: fileIds } });
+    const dataResponse = users.map((u) => {
+      const file = files.find((f) => `${f._id}` === `${u.avatarId}`);
+      const { password, ...response } = u;
+      return {
+        ...response,
+        ...(file && { avatar: `${process.env.DOMAIN}/${file.fileUrl}` })
+      };
+    });
+
+    return dataResponse;
+  } catch (e) {
+    await httpErrorService.create({ error: e, localtion: 'Finde list detail user fail Service' });
+    return null;
+  }
+};
+
 const update = async (payload) => {
   try {
     if (!payload || !payload?._id) return null;
@@ -91,5 +119,6 @@ const update = async (payload) => {
 module.exports = {
   update,
   deleted,
-  getDetail
+  getDetail,
+  findDetailByIds
 };

@@ -27,9 +27,9 @@ const create = async (payload) => {
   }
 };
 
-const getTransactions = async (query) => {
+const getTransactions = async (query, userInfo) => {
   try {
-    if (!query.userId) return [];
+    if (!query.userId && userInfo?.role === 'user') return [];
     const { fromDate, toDate, ...payload } = query;
     const data = await stockTransactionModel.find({
       ...payload,
@@ -53,14 +53,16 @@ const getTransactions = async (query) => {
     if (!data?.length) return [];
     const productIds = data.map((d) => d?.productId);
     const housewareIds = data.map((d) => d?.housewareId);
-    const [products, housewares, user] = await Promise.all([
-      productService.getList({ _id: { $in: productIds }, userId: query.userId }),
-      housewareService.getList({ _id: { $in: housewareIds }, userId: query.userId }),
-      userService.getDetail({ _id: data[0].userId })
+    const userIds = [...new Map(data.map((d) => [`${d.userId}`, d.userId])).values()];
+    const [products, housewares, users] = await Promise.all([
+      productService.getList({ _id: { $in: productIds }, ...(userInfo?.role !== 'admin' && { userId: query.userId }) }, userInfo),
+      housewareService.getList({ _id: { $in: housewareIds }, ...(userInfo?.role !== 'admin' && { userId: query.userId }) }, userInfo),
+      userService.findDetailByIds(userIds)
     ]);
     const dataResponse = data.map((d) => {
       const product = products.find((p) => `${p._id}` === `${d.productId}`);
       const houseware = housewares.find((h) => `${h._id}` === `${d.housewareId}`);
+      const user = users.find((u) => `${u._id}` === `${d.userId}`);
       return {
         ...d,
         imageUrl: product?.imageUrl || '',

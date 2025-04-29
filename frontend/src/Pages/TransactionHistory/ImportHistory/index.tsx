@@ -40,9 +40,8 @@ const ImportHistory: React.FC = () => {
   const getTransaction = async () => {
     const transaction = await importProductService.getList({
       ...filter,
-      userId: user?._id
+      ...(user?.role !== 'admin' && {userId: user?._id}) 
     });
-    console.log('transaction', transaction)
 
     setTransactionImport(transaction);
   }
