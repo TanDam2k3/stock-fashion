@@ -1,6 +1,5 @@
 
 import React, { useContext, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { FaEye } from 'react-icons/fa';
 import ProductDetailPopup from '../../../components/transaction-history/edit-popup';
 import { ITransaction } from '../../../interfaces';
@@ -25,7 +24,6 @@ const ImportHistory: React.FC = () => {
   });
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectTransaction, setSelectTransaction] = useState<ITransaction | null>(null);
-  const { register } = useForm<ITransaction>();
 
   const handleViewDetail = (product: ITransaction) => {
     setSelectTransaction(product);
@@ -50,126 +48,133 @@ const ImportHistory: React.FC = () => {
   }, [filter, user]);
 
   return (
-    <div className="w-full rounded-md flex flex-col p-4 min-h-full">
-      <div className="w-full sm:max-w-[1200px] mx-auto">
-        <div className="bg-white rounded-md px-2">
-          <h1 className='text-xl font-semibold mb-4 sm:mb-6'>IMPORT HISTORY</h1>
-          <form className="bg-white rounded-md p-4 sm:p-6 mb-6 space-y-6 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-x-6">
+    <div className="w-full rounded-md flex flex-col p-5 min-h-full">
+      <div className="min-w-[1200px] mx-auto">
+      <div className="bg-white rounded-md px-2">
+          <h1 className='text-xl font-semibold'>IMPORT HISTORY</h1>
+          <form className="bg-white rounded-md p-4 sm:p-6 mb-6 space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-x-6">
             <div>
-              <label htmlFor="from-date" className="block text-xs sm:text-sm font-semibold text-[#1E1E1E] mb-1">
+              <label htmlFor="from-date" className="block text-sm font-medium text-gray-700 mb-1">
                 Từ ngày
               </label>
               <div className="relative">
                 <input
                   id="from-date"
                   type="date"
-                  onChange={(value) => setFilter({ ...filter, fromDate: new Date(value.target.value) })}
-                  className="w-full border border-[#E5E7EB] rounded-md bg-white text-xs sm:text-sm text-[#6B7280] py-2 px-3 pl-9"
+                  className="w-full border border-gray-300 rounded-md pl-10 pr-3 py-2 text-sm text-gray-700"
+                  onChange={(value) =>
+                    setFilter({ ...filter, fromDate: new Date(value.target.value) })
+                  }
                 />
-                <i className="fas fa-calendar-alt absolute left-3 top-1/2 -translate-y-1/2 text-[#6B7280] text-sm pointer-events-none"></i>
+                <i className="fas fa-calendar-alt absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></i>
               </div>
             </div>
   
             <div>
-              <label htmlFor="to-date" className="block text-xs sm:text-sm font-semibold text-[#1E1E1E] mb-1">
+              <label htmlFor="to-date" className="block text-sm font-medium text-gray-700 mb-1">
                 Đến ngày
               </label>
               <div className="relative">
                 <input
                   id="to-date"
                   type="date"
-                  onChange={(value) => setFilter({ ...filter, toDate: new Date(value.target.value) })}
-                  className="w-full border border-[#E5E7EB] rounded-md bg-white text-xs sm:text-sm text-[#6B7280] py-2 px-3 pl-9"
+                  className="w-full border border-gray-300 rounded-md pl-10 pr-3 py-2 text-sm text-gray-700"
+                  onChange={(value) =>
+                    setFilter({ ...filter, toDate: new Date(value.target.value) })
+                  }
                 />
-                <i className="fas fa-calendar-alt absolute left-3 top-1/2 -translate-y-1/2 text-[#6B7280] text-sm pointer-events-none"></i>
+                <i className="fas fa-calendar-alt absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></i>
               </div>
             </div>
           </form>
         </div>
   
-        {/* Bảng sản phẩm */}
-        <section className="bg-white rounded-md p-4 sm:p-6">
+        {/* Section Export Table */}
+        <section className="bg-white rounded-md p-4 mb-10">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-[#1E1E1E] font-semibold text-sm sm:text-base">
-              Thông tin phiếu nhập
-            </h2>
+            <h2 className="text-base font-semibold text-gray-800">Thông tin phiếu xuất kho</h2>
           </div>
   
-          {/* Table with horizontal scrolling on mobile */}
-          <div className="overflow-x-auto">
-            <table className="min-w-full border-collapse text-xs sm:text-sm">
+          {/* Table View for Desktop */}
+          <div className="w-full overflow-x-auto hidden sm:block">
+            <table className="min-w-full border-collapse text-sm">
               <thead>
-                <tr className="bg-[#C6D5F7] text-[#0B2E65] font-semibold text-center">
-                  <th className="py-2 px-3 border border-[#AFC3F7]">Mã phiếu</th>
-                  <th className="py-2 px-3 border border-[#AFC3F7]">Tên kho hàng</th>
-                  <th className="py-2 px-3 border border-[#AFC3F7]">Tên sản phẩm</th>
-                  <th className="py-2 px-3 border border-[#AFC3F7]">Số lượng</th>
-                  <th className="py-2 px-3 border border-[#AFC3F7]">Người thực hiện</th>
-                  <th className="py-2 px-3 border border-[#AFC3F7]">View</th>
+                <tr className="bg-blue-100 text-blue-800 font-semibold">
+                  <th className="py-2 px-3 border border-blue-200">Mã phiếu</th>
+                  <th className="py-2 px-3 border border-blue-200">Tên kho hàng</th>
+                  <th className="py-2 px-3 border border-blue-200">Tên sản phẩm</th>
+                  <th className="py-2 px-3 border border-blue-200">Số lượng</th>
+                  <th className="py-2 px-3 border border-blue-200">Người thực hiện</th>
+                  <th className="py-2 px-3 border border-blue-200">View</th>
                 </tr>
               </thead>
               <tbody>
-                {transactionImport?.length > 0 && transactionImport.map((transaction) => (
-                  <tr key={transaction._id} className="text-center text-[#1E1E1E]">
-                    <td className="border border-[#E5E7EB] p-1">
-                      <input
-                        {...register('_id')}
-                        readOnly
-                        className="w-full border rounded px-2 py-1 bg-[#F9FAFB] cursor-not-allowed text-center"
-                        value={transaction._id}
-                      />
+                {transactionImport?.length > 0 ? (
+                  transactionImport.map((transaction) => (
+                    <tr key={transaction._id} className="text-center text-gray-800">
+                      <td className="border border-gray-200 p-2">{transaction._id}</td>
+                      <td className="border border-gray-200 p-2">{transaction.housewareName}</td>
+                      <td className="border border-gray-200 p-2">{transaction.productName}</td>
+                      <td className="border border-gray-200 p-2">{transaction.quantity}</td>
+                      <td className="border border-gray-200 p-2">{transaction.userName}</td>
+                      <td className="border border-gray-200 p-2">
+                        <button
+                          type="button"
+                          onClick={() => handleViewDetail(transaction)}
+                          className="text-blue-500 hover:text-blue-700"
+                        >
+                          <FaEye />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} className="text-center py-4 text-gray-400">
+                      Không có dữ liệu
                     </td>
-                    <td className="border border-[#E5E7EB] p-1">
-                      <input
-                        {...register('housewareName')}
-                        readOnly
-                        className="w-full border rounded px-2 py-1 bg-[#F9FAFB] cursor-not-allowed text-center"
-                        value={transaction?.housewareName || ''}
-                      />
-                    </td>
-                    <td className="border border-[#E5E7EB] p-1">
-                      <input
-                        {...register('productName')}
-                        readOnly
-                        className="w-full border rounded px-2 py-1 bg-[#F9FAFB] cursor-not-allowed text-center"
-                        value={transaction?.productName || ''}
-                      />
-                    </td>
-                    <td className="border border-[#E5E7EB] p-1">
-                      <input
-                        type="number"
-                        {...register('quantity', { valueAsNumber: true })}
-                        readOnly
-                        className="w-full border rounded px-2 py-1 bg-[#F9FAFB] cursor-not-allowed text-center"
-                        value={transaction?.quantity || 0}
-                      />
-                    </td>
-                    <td className="border border-[#E5E7EB] p-1">
-                      <input
-                        {...register('userName')}
-                        readOnly
-                        className="w-full border rounded px-2 py-1 bg-[#F9FAFB] cursor-not-allowed text-center"
-                        value={transaction?.userName || ''}
-                      />
-                    </td>
-                    <td className="border border-[#E5E7EB] p-1">
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+  
+          {/* Card View for Mobile */}
+          <div className="block sm:hidden space-y-4">
+            {transactionImport?.length > 0 ? (
+              transactionImport.map((transaction) => (
+                <div
+                  key={transaction._id}
+                  className="border border-gray-200 rounded-lg p-4 bg-gray-50 shadow-sm"
+                >
+                  <div className="text-sm text-gray-700 space-y-1">
+                    <p><strong>Mã phiếu:</strong> {transaction._id}</p>
+                    <p><strong>Tên kho hàng:</strong> {transaction.housewareName}</p>
+                    <p><strong>Tên sản phẩm:</strong> {transaction.productName}</p>
+                    <p><strong>Số lượng:</strong> {transaction.quantity}</p>
+                    <p><strong>Người thực hiện:</strong> {transaction.userName}</p>
+                    <div className="flex justify-end mt-2">
                       <button
                         type="button"
                         onClick={() => handleViewDetail(transaction)}
-                        className="flex justify-center items-center w-full text-blue-500 hover:text-blue-700"
+                        className="text-blue-500 hover:text-blue-700 flex items-center gap-1"
                       >
-                        <FaEye />
+                        <FaEye /> Xem chi tiết
                       </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center text-gray-400">
+                Không có dữ liệu
+              </div>
+            )}
           </div>
         </section>
       </div>
   
-      {/* Show Product Detail Popup */}
+      {/* Popup Detail */}
       {isPopupOpen && selectTransaction && (
         <ProductDetailPopup transaction={selectTransaction} onClose={handleClosePopup} />
       )}
