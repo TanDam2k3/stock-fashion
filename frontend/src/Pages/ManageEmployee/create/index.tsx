@@ -1,6 +1,10 @@
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { productService, userService } from "../../../services";
+import { toast } from "react-toastify";
+import { ENCRYPT_KEY } from "../../../config";
+import CryptoJS from 'crypto-js';
 
 type Inputs = {
   name: string;
@@ -11,12 +15,12 @@ type Inputs = {
   username: string;
   password: string;
   confirmPassword: string;
-  stockManage: string;  
+  file: File | null;
 };
 
 const CreateEmployee: React.FC = () => {
   const navigate = useNavigate();
-  
+
   const {
     register,
     handleSubmit,
@@ -33,30 +37,46 @@ const CreateEmployee: React.FC = () => {
       username: '',
       password: '',
       confirmPassword: '',
+      file: null
     }
   });
 
-  const [avatar, password] = watch(['avatar', 'password']);
+  const [avatar, password, file] = watch(['avatar', 'password', 'file']);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      console.log('Dữ liệu nhân viên:', data);
-      alert('Tạo nhân viên thành công!');
-      navigate('/employees');
+      let fileDetail = null;
+
+      if (file) {
+        fileDetail = await productService.uploadImage(file);
+      }
+
+      const encrypted = CryptoJS.AES.encrypt(data?.password, ENCRYPT_KEY).toString();
+
+
+      const payload = {
+        ...data,
+        avatarId: fileDetail?.file?._id,
+        password: encrypted
+      };
+      const user = await userService.create(payload);
+      if (user) {
+        toast.success('Tạo nhân viên thành công!');
+        navigate('/employees');
+      } else {
+        toast.error('Đã có lỗi xảy ra khi tạo nhân viên.');
+      }
     } catch (error) {
-      console.error(error);
-      alert('Đã có lỗi xảy ra khi tạo nhân viên.');
+      toast.error(`${error}`);
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setValue("avatar", reader.result as string, { shouldValidate: true });
-      };
-      reader.readAsDataURL(file);
+    const urlPreview = file && URL.createObjectURL(file);
+    if (urlPreview) {
+      setValue("avatar", `${urlPreview}`, { shouldValidate: true });
+      setValue("file", file, { shouldValidate: true });
     }
   };
 
@@ -68,125 +88,108 @@ const CreateEmployee: React.FC = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col md:flex-row gap-8">
         {/* Phần form thông tin bên trái */}
         <div className="md:w-2/3 space-y-6">
-  {/* Họ và tên & Tên đăng nhập */}
-  <div className="flex flex-col md:flex-row gap-4">
-    <div className="flex-1">
-      <label className="block text-sm font-semibold text-gray-700 mb-1">
-        Họ và tên <span className="text-red-500">*</span>
-      </label>
-      <input
-        type="text"
-        {...register("name", { required: "Họ và tên không được bỏ trống" })}
-        className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 ${errors.name ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
-        placeholder="Nhập họ và tên"
-      />
-      {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
-    </div>
+          {/* Họ và tên & Tên đăng nhập */}
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-gray-700 mb-1">
+                Họ và tên <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                {...register("name", { required: "Họ và tên không được bỏ trống" })}
+                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 ${errors.name ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
+                placeholder="Nhập họ và tên"
+              />
+              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+            </div>
 
-    <div className="flex-1">
-      <label className="block text-sm font-semibold text-gray-700 mb-1">
-        Tên đăng nhập <span className="text-red-500">*</span>
-      </label>
-      <input
-        type="text"
-        {...register("username", { 
-          required: "Tên đăng nhập không được bỏ trống",
-          minLength: {
-            value: 6,
-            message: "Tên đăng nhập phải có ít nhất 6 ký tự"
-          }
-        })}
-        className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 ${errors.username ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
-        placeholder="Nhập tên đăng nhập"
-      />
-      {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>}
-    </div>
-  </div>
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-gray-700 mb-1">
+                Tên đăng nhập <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                {...register("username", {
+                  required: "Tên đăng nhập không được bỏ trống",
+                  minLength: {
+                    value: 6,
+                    message: "Tên đăng nhập phải có ít nhất 6 ký tự"
+                  }
+                })}
+                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 ${errors.username ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
+                placeholder="Nhập tên đăng nhập"
+              />
+              {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>}
+            </div>
+          </div>
 
-  {/* Mật khẩu & Nhập lại mật khẩu */}
-  <div className="flex flex-col md:flex-row gap-4">
-    <div className="flex-1">
-      <label className="block text-sm font-semibold text-gray-700 mb-1">
-        Mật khẩu <span className="text-red-500">*</span>
-      </label>
-      <input
-        type="password"
-        {...register("password", { 
-          required: "Mật khẩu không được bỏ trống",
-          minLength: {
-            value: 8,
-            message: "Mật khẩu phải có ít nhất 8 ký tự"
-          }
-        })}
-        className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 ${errors.password ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
-        placeholder="Nhập mật khẩu"
-      />
-      {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
-    </div>
+          {/* Mật khẩu & Nhập lại mật khẩu */}
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-gray-700 mb-1">
+                Mật khẩu <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="password"
+                {...register("password", {
+                  required: "Mật khẩu không được bỏ trống",
+                  minLength: {
+                    value: 8,
+                    message: "Mật khẩu phải có ít nhất 8 ký tự"
+                  }
+                })}
+                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 ${errors.password ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
+                placeholder="Nhập mật khẩu"
+              />
+              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+            </div>
 
-    <div className="flex-1">
-      <label className="block text-sm font-semibold text-gray-700 mb-1">
-        Nhập lại mật khẩu <span className="text-red-500">*</span>
-      </label>
-      <input
-        type="password"
-        {...register("confirmPassword", { 
-          required: "Vui lòng nhập lại mật khẩu",
-          validate: value => 
-            value === password || "Mật khẩu không khớp"
-        })}
-        className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 ${errors.confirmPassword ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
-        placeholder="Nhập lại mật khẩu"
-      />
-      {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>}
-    </div>
-  </div>
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-gray-700 mb-1">
+                Nhập lại mật khẩu <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="password"
+                {...register("confirmPassword", {
+                  required: "Vui lòng nhập lại mật khẩu",
+                  validate: value =>
+                    value === password || "Mật khẩu không khớp"
+                })}
+                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 ${errors.confirmPassword ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
+                placeholder="Nhập lại mật khẩu"
+              />
+              {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>}
+            </div>
+          </div>
 
-  <div>
-    <label className="block text-sm font-semibold text-gray-700 mb-1">
-      Kho hàng <span className="text-red-500">*</span>
-    </label>
-    <select
-      {...register("stockManage", { required: "Vui lòng chọn kho hàng" })}
-      className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 ${errors.stockManage ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
-    >
-      <option value="">-- Chọn kho hàng --</option>
-      <option value="Kho A">Kho A</option>
-      <option value="Kho B">Kho B</option>
-      <option value="Kho C">Kho C</option>
-      {/* Add more warehouse options as needed */}
-    </select>
-    {errors.stockManage && <p className="text-red-500 text-sm mt-1">{errors.stockManage.message}</p>}
-  </div>
+          {/* Số điện thoại & Email */}
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-gray-700 mb-1">
+                Số điện thoại <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="tel"
+                {...register("phone", { required: "Số điện thoại không được bỏ trống" })}
+                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 ${errors.phone ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
+                placeholder="Nhập số điện thoại"
+              />
+              {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
+            </div>
 
-     {/* Số điện thoại & Email */}
-  <div className="flex flex-col md:flex-row gap-4">
-    <div className="flex-1">
-      <label className="block text-sm font-semibold text-gray-700 mb-1">
-        Số điện thoại <span className="text-red-500">*</span>
-      </label>
-      <input
-        type="tel"
-        {...register("phone", { required: "Số điện thoại không được bỏ trống" })}
-        className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 ${errors.phone ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
-        placeholder="Nhập số điện thoại"
-      />
-      {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
-    </div>
-
-    <div className="flex-1">
-      <label className="block text-sm font-semibold text-gray-700 mb-1">
-        Email <span className="text-red-500">*</span>
-      </label>
-      <input
-        type="email"
-        {...register("email", { required: "Email không được bỏ trống" })}
-        className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 ${errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
-        placeholder="Nhập email"
-      />
-      {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
-    </div>
-  </div>
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-gray-700 mb-1">
+                Email <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="email"
+                {...register("email", { required: "Email không được bỏ trống" })}
+                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 ${errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
+                placeholder="Nhập email"
+              />
+              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+            </div>
+          </div>
 
 
           {/* Địa chỉ */}

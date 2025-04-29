@@ -6,6 +6,7 @@ import {
   FaUserFriends,
   FaCogs,
   FaChartLine,
+  FaFileExport,
 } from "react-icons/fa";
 import { TbLogout2 } from "react-icons/tb";
 import {
@@ -26,6 +27,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
+  const { user } = useContext(AuthContext);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const { logout } = useContext(AuthContext);
 
@@ -40,35 +42,43 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
     onClick?: () => void,
     hasDropdown?: boolean,
     dropdownKey?: string
-  ) => (
-    <li
-      className={`p-4 hover:bg-primary-th1/40 transition-colors duration-300 ease-in-out cursor-pointer flex items-center ${isOpen ? "justify-between" : "justify-center"
-        }`}
-
-      onClick={onClick}
-    >
-      {to ? (
-        <Link to={to} className="flex items-center gap-2">
-          {icon}
-          {isOpen && <span>{label}</span>}
-        </Link>
-      ) : (
+  ) => {
+    const content = (
+      <div className="flex items-center justify-between w-full">
         <div className="flex items-center gap-2">
           {icon}
           {isOpen && <span>{label}</span>}
         </div>
-      )}
-
-      {/* Icon bên phải */}
-      {isOpen &&
-        hasDropdown &&
-        (openDropdown === dropdownKey ? (
-          <MdKeyboardArrowDown size={25} />
-        ) : (
-          <MdArrowForwardIos />
-        ))}
-    </li>
-  );
+        {isOpen && hasDropdown && (
+          openDropdown === dropdownKey ? (
+            <MdKeyboardArrowDown size={25} />
+          ) : (
+            <MdArrowForwardIos />
+          )
+        )}
+      </div>
+    );
+  
+    if (to) {
+      return (
+        <Link to={to} onClick={onClick}>
+          <li className="p-4 hover:bg-primary-th1/40 transition-colors duration-300 ease-in-out cursor-pointer flex items-center justify-center">
+            {content}
+          </li>
+        </Link>
+      );
+    } else {
+      return (
+        <li
+          className="p-4 hover:bg-primary-th1/40 transition-colors duration-300 ease-in-out cursor-pointer flex items-center justify-center"
+          onClick={onClick}
+        >
+          {content}
+        </li>
+      );
+    }
+  };
+  
 
 
 
@@ -81,11 +91,31 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   );
 
   return (
-
     <div
       className={`fixed top-0 font-medium left-0 h-full bg-custom-sidebar text-white transform transition-all duration-300 ease-in-out ${isOpen ? "w-64" : "w-16"
         }`}
+      style={{
+        overflowY: 'hidden',
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none',
+        scrollBehavior: 'smooth',
+        transition: 'overflow-y 0.5s ease-in-out',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.overflowY = 'auto';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.overflowY = 'hidden';
+      }}
     >
+
+      <style>{`
+    .sidebar-container::-webkit-scrollbar {
+      display: none;
+    }
+  `}</style>
+
+
       <div className="flex justify-end p-4">
         <button onClick={toggleSidebar} className="text-2xl text-white">
           {isOpen ? <IoArrowBackOutline /> : <IoArrowForwardOutline />}
@@ -111,6 +141,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
           {menuItem(<FaBoxes />, "Kho hàng", "stocks")}
 
           {menuItem(<GiClothes />, "Sản phẩm", "products")}
+          {menuItem(<FaFileExport />, "Nhập kho", "import")}
+          {menuItem(<FaFileExport />, "Xuất kho", "export")}
 
           {/* Phiếu báo cáo */}
           {menuItem(<FaChartLine />, "Lịch sử giao dịch", undefined, () =>
@@ -118,21 +150,32 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
           )}
           {openDropdown === "report" && isOpen && (
             <ul className="ml-8">
-              {dropdownItem("/report/import", "Nhập kho")}
-              {dropdownItem("/report/export", "Xuất kho")}
+              {dropdownItem("report/import", "Nhập kho")}
+              {dropdownItem("report/export", "Xuất kho")}
             </ul>
           )}
 
-          {menuItem(<FaCogs />, "Setting", "settings")}
-          {menuItem(<FaUserFriends />, "Nhân sự", undefined, () =>
-            toggleDropdown("employee"), true, "employee"
+          {user && user.role !== 'admin' && (
+            <>
+              {menuItem(<FaCogs />, "Setting", "settings")}
+
+            </>
           )}
-          {openDropdown === "employee" && isOpen && (
-            <ul className="ml-8">
-              {dropdownItem("employees/create", "Tạo mới nhân sự")}
-              {dropdownItem("employees", "Quản lý nhân sự")}
-            </ul>
+
+          {user && user.role === 'admin' && (
+            <>
+              {menuItem(<FaUserFriends />, "Nhân sự", undefined, () =>
+                toggleDropdown("employee"), true, "employee"
+              )}
+              {openDropdown === "employee" && isOpen && (
+                <ul className="ml-8">
+                  {dropdownItem("employees/create", "Tạo mới nhân sự")}
+                  {dropdownItem("employees", "Quản lý nhân sự")}
+                </ul>
+              )}
+            </>
           )}
+
           {menuItem(<TbLogout2 />, "Log out", "login", logout)}
 
         </ul>

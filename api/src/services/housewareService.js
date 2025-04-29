@@ -21,6 +21,7 @@ const create = async (payload) => {
 
 const getList = async (query) => {
   try {
+    if (!query.userId) return [];
     const data = await housewareModel.find(query).lean();
     return data;
   } catch (e) {

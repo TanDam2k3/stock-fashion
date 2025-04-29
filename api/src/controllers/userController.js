@@ -1,6 +1,7 @@
 /* eslint-disable no-unsafe-optional-chaining */
 const adminService = require('../services/adminService');
 const httpErrorService = require('../services/httpErrorService');
+const userService = require('../services/userService');
 
 exports.deleted = async (req, res) => {
   try {
@@ -18,15 +19,14 @@ exports.deleted = async (req, res) => {
   }
 };
 
-exports.getList = async (req, res) => {
+exports.findDetail = async (req, res) => {
   try {
-    const { role } = req?.user;
-    if (!role || role !== 'admin') res.status(404).json({ message: 'Forbidden' });
-    const users = await adminService.getList(req?.query);
-    res.status(201).json({ users });
+    if (!req.query) return null;
+    const user = await userService.getDetail(req?.query);
+    res.status(200).json(user);
   } catch (e) {
-    await httpErrorService.create(e, 'Get List User');
-    res.status(500).json({ message: e });
+    await httpErrorService.create(e, 'Finde detail of user fail');
+    res.status(400).json(null);
   }
 };
 

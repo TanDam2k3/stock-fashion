@@ -4,11 +4,12 @@ import { API_END_POINT } from '../config';
 import Cookies from 'js-cookie';
 import { Houseware, HousewarePayload } from '../interfaces';
 
-const TOKEN = Cookies.get('token') || null;
 
 class HousewareService {
   public async create(payload: HousewarePayload) {
     try {
+      const TOKEN = Cookies.get('token') || null;
+
       const response = await axios.post(
         `${API_END_POINT}/api/houseware/create`,
         payload,
@@ -27,6 +28,8 @@ class HousewareService {
 
   public async getListHouseware(filter: HousewarePayload) {
     try {
+      const TOKEN = Cookies.get('token') || null;
+
       const payload = {
         ...(filter?.userId && { userId: filter.userId }),
         ...(filter?.name && { name: filter.name }),
@@ -58,6 +61,8 @@ class HousewareService {
 
   public async update(payload: Houseware) {
     try {
+      const TOKEN = Cookies.get('token') || null;
+
       const response = await axios.put(`${API_END_POINT}/api/houseware/update`,
         { payload },
         {
@@ -76,6 +81,8 @@ class HousewareService {
 
   public async delete(id: string) {
     try {
+      const TOKEN = Cookies.get('token') || null;
+
       const response = await axios.delete(`${API_END_POINT}/api/houseware/delete`, {
         headers: {
           Authorization: `Bearer ${TOKEN}`,

@@ -29,6 +29,7 @@ const create = async (payload) => {
 
 const getList = async (query) => {
   try {
+    if (!query.userId) return [];
     const data = await productModel.find(query).lean();
     if (!data?.length) return [];
 
@@ -66,13 +67,17 @@ const deleteProduct = async (payload) => {
 
 const updatedProduct = async (payload) => {
   try {
+    const { _id, quantity, ...dataUpdate } = payload;
     const updated = await productModel.findOneAndUpdate(
       {
-        _id: new ObjectId(payload._id)
+        _id: new ObjectId(_id)
       },
       {
+        $inc: {
+          quantity: quantity ? Number(quantity) : 0
+        },
         $set: {
-          ...payload,
+          ...dataUpdate,
           updatedAt: new Date()
         }
       },

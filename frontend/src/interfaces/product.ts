@@ -11,6 +11,7 @@ export interface ProductPayload {
 }
 
 export interface ProductSearchPayload {
+    housewareId?: string;
     userId?: string;
     name?: string;
     type?: string;

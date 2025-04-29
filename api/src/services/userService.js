@@ -29,25 +29,22 @@ const deleted = async (payload) => {
   }
 };
 
-const getList = async (query) => {
+const getDetail = async (query) => {
   try {
-    const users = await userModel.find({
-      ...query,
-      username: { $ne: 'admin' }
-    }).lean();
-    const fileIds = users.map((u) => u?.avatarId);
+    if (!query?._id) return null;
+    const user = await userModel.findById(new ObjectId(query._id)).lean();
 
-    const files = await fileService.getList({ _id: { $in: fileIds } });
-    const filesMap = new Map(files.map((f) => [`${f._id}`, f.fileUrl])) || new Map();
+    if (!user || user.status === 'inactive') return null;
+    const file = await fileService.findById(user.avatarId);
+    const dataRespont = {
+      ...user,
+      ...(file && { avatar: `${process.env.DOMAIN}/${file.fileUrl}` })
+    };
 
-    const dataRespont = users.map((u) => ({
-      ...u,
-      avatar: `${process.env.DOMAIN}/${filesMap.get(`${u.avatarId}`)}`
-    }));
     return dataRespont;
   } catch (e) {
-    await httpErrorService.create({ error: e, localtion: 'Get list user from admin fail Service' });
-    return [];
+    await httpErrorService.create({ error: e, localtion: 'Finde detail user fail Service' });
+    return null;
   }
 };
 
@@ -81,44 +78,8 @@ const update = async (payload) => {
   }
 };
 
-const create = async (payload) => {
-  try {
-    if (!payload?.username || !payload?.password) return null;
-    const [existing, rawPassword] = await Promise.all([
-      userModel.findOne({
-        $or: [
-          { username: payload?.username },
-          { email: payload?.email }
-        ]
-      }),
-      decryptPassword(payload?.password)
-    ]);
-    if (existing) return null;
-    const hashed = await hashPassword(rawPassword);
-
-    const user = {
-      avatarId: new ObjectId(payload.avatarId),
-      email: payload?.email,
-      username: payload?.username,
-      name: payload?.name,
-      phone: payload?.phone,
-      address: payload?.address,
-      password: hashed,
-      role: 'user',
-      status: 'active'
-    };
-
-    const createUser = await userModel.create(user);
-    return createUser;
-  } catch (e) {
-    await httpErrorService.create({ error: e, localtion: 'Admin create user' });
-    return null;
-  }
-};
-
 module.exports = {
-  create,
   update,
   deleted,
-  getList
+  getDetail
 };
