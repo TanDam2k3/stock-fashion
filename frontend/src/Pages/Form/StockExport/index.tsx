@@ -27,7 +27,10 @@ const ExportStock: React.FC = () => {
 
   const getListHouseware = async () => {
     try {
-      const houseware = await housewareService.getListHouseware({ status: 'active', userId: user?._id });
+      const houseware = await housewareService.getListHouseware({ 
+        status: 'active', 
+        ...(user?.role !== 'admin' && {userId: user?._id}) 
+      });
       setHousewares(houseware);
     } catch (error) {
       console.error('Error fetching houseware list:', error);
@@ -38,7 +41,10 @@ const ExportStock: React.FC = () => {
 
   const getList = async () => {
     try {
-      const response = await productService.getList({ housewareId: onChangeHouseware, userId: user?._id });
+      const response = await productService.getList({ 
+        housewareId: onChangeHouseware, 
+        ...(user?.role !== 'admin' && {userId: user?._id})  
+      });
       response?.length && setProducts(response);
     } catch (error) {
       console.error('Failed to fetch products', error);
