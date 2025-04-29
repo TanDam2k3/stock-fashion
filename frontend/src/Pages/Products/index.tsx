@@ -125,14 +125,24 @@ const ProductList: React.FC = () => {
 
 
   return (
-    <div className="bg-gray-100 font-sans">
-      <div className="max-w-full min-h-screen p-4 bg-gray-100">
-        <div className="max-w-[1200px] mx-auto bg-white shadow-sm rounded-sm">
-          <div className="bg-black text-white font-semibold text-lg px-6 py-3 select-none">
-            DANH SÁCH HÀNG HÓA
-          </div>
-
-          <FilterForm filters={filters} onChange={handleFilterChange} onSubmit={handleSubmit} />
+    <div className="bg-gray-100 font-sans min-h-screen p-4">
+      <div className="max-w-full sm:max-w-[1200px] mx-auto bg-white shadow rounded overflow-hidden">
+        {/* Tiêu đề */}
+        <div className="bg-black text-white text-center font-semibold text-base sm:text-lg py-4 px-4">
+          DANH SÁCH HÀNG HÓA
+        </div>
+  
+        {/* Form lọc */}
+        <div className="px-4 sm:px-8 pt-6 pb-8">
+          <FilterForm
+            filters={filters}
+            onChange={handleFilterChange}
+            onSubmit={handleSubmit}
+          />
+        </div>
+  
+        {/* Bảng sản phẩm */}
+        <div className="px-4 sm:px-8 pt-6 pb-10 overflow-x-auto">
           <ProductTable
             products={paginatedProducts}
             currentPage={currentPage}
@@ -144,34 +154,60 @@ const ProductList: React.FC = () => {
           />
         </div>
       </div>
-
+  
+      {/* Popup xác nhận xóa */}
       {showConfirmPopup && (
-        <ConfirmDeletePopup
-          onConfirm={handleConfirmDelete}
-          onCancel={handleCancelDelete}
-          title="Confirm Deletion"
-          description="Are you sure you want to delete this product? This action cannot be undone."
-        />
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4">
+          <div className="bg-white rounded-lg shadow-lg w-full sm:w-96 max-w-lg p-6">
+            <div className="text-center text-xl font-semibold mb-4">
+              Xác nhận xóa
+            </div>
+            <div className="text-gray-700 text-sm mb-6">
+              Bạn có chắc chắn muốn xóa sản phẩm này không? Hành động này không thể hoàn tác.
+            </div>
+            <div className="flex justify-around">
+              <button
+                onClick={handleCancelDelete}
+                className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded-md w-full sm:w-auto text-sm"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md w-full sm:w-auto text-sm"
+              >
+                Xóa
+              </button>
+            </div>
+          </div>
+        </div>
       )}
-
+  
+      {/* Popup chỉnh sửa sản phẩm */}
       {editProduct && (
-        <EditProductPopup
-          initialData={{
-            name: editProduct?.name ? editProduct.name : '',
-            type: editProduct?.type ? editProduct?.type : '',
-            quantity: editProduct?.quantity ? editProduct.quantity : 0,
-            price: editProduct?.price ? editProduct.price : 0,
-            housewareId: editProduct?.housewareId ? editProduct.housewareId : ''
-          }}
-          housewareOptions={housewareOptions}
-          onSubmit={(data) => {
-            handleSaveEdit(data);
-          }}
-          onCancel={handleCancelEdit}
-        />
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4">
+          <div className="bg-white rounded-lg shadow-lg w-full sm:w-96 max-w-lg p-6">
+            <div className="text-center text-xl font-semibold mb-4">
+              Chỉnh sửa sản phẩm
+            </div>
+            <EditProductPopup
+              initialData={{
+                name: editProduct?.name ?? '',
+                type: editProduct?.type ?? '',
+                quantity: editProduct?.quantity ?? 0,
+                price: editProduct?.price ?? 0,
+                housewareId: editProduct?.housewareId ?? ''
+              }}
+              housewareOptions={housewareOptions}
+              onSubmit={handleSaveEdit}
+              onCancel={handleCancelEdit}
+            />
+          </div>
+        </div>
       )}
     </div>
   );
+  
 };
 
 export default ProductList;
