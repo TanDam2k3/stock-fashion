@@ -17,7 +17,7 @@ exports.create = async (req, res) => {
 
 exports.getList = async (req, res) => {
   try {
-    const products = await productService.getList(req?.query);
+    const products = await productService.getList(req?.query, req?.user);
     res.status(201).json({ products });
   } catch (e) {
     await httpErrorService.create(e, 'Get list product');

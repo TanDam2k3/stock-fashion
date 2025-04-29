@@ -1,6 +1,5 @@
 
 import React, { useContext, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { FaEye } from 'react-icons/fa';
 import ProductDetailPopup from '../../../components/transaction-history/edit-popup';
 import { ITransaction } from '../../../interfaces';
@@ -25,10 +24,6 @@ const ExportHistory: React.FC = () => {
   });
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectTransaction, setSelectTransaction] = useState<ITransaction | null>(null);
-
-
-  const { register } = useForm<ITransaction>();
-
 
   const handleViewDetail = (transaction: ITransaction) => {
     setSelectTransaction(transaction);

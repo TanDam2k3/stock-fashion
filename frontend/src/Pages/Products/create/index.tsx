@@ -192,7 +192,7 @@ const handleScroll = () => {
             </div>
 
             <div className="relative">
-              <label htmlFor="city" className="block text-sm font-semibold text-black mb-1">City</label>
+              <label htmlFor="city" className="block text-sm font-semibold text-black mb-1">Type</label>
               <input
                 id="type"
                 type="text"

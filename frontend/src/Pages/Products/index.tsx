@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import FilterForm from '../../components/listProduct/filter';
 import ProductTable from '../../components/listProduct/table-in-stock';
-import ConfirmDeletePopup from '../../components/popup/confirm-deleted-popup';
 import { toast } from 'react-toastify';
 import EditProductPopup from '../../components/listProduct/edit-popup-product';
 import { housewareService, productService } from '../../services';
@@ -15,7 +14,6 @@ const ProductList: React.FC = () => {
     name: '',
     type: '',
     createdAt: undefined,
-    userId: user?._id,
     status: 'active'
   });
 
@@ -37,15 +35,12 @@ const ProductList: React.FC = () => {
     try {
       const response = await productService.getList({
         ...filters,
-        userId: user?._id
+        ...(user?.role !== 'admin' && {userId: user?._id})
       });
       setProducts(response || []);
-            if (filters.type && response?.length === 0) {
-      }
     } catch (error) {
       setProducts([]);
-    } finally {
-   
+      toast.error(`${error}`);
     }
   }
 
@@ -129,6 +124,15 @@ const ProductList: React.FC = () => {
     user && loadHousewareOptions();
     user && getList();
   }, [filters, user]);
+
+  useEffect(() => {
+    setFilters({
+      name: '',
+      type: '',
+      createdAt: undefined,
+      status: 'active'
+    });
+  },[]);
 
 
   return (

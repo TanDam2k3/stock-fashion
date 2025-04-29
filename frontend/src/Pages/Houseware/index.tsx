@@ -14,7 +14,6 @@ const StockList: React.FC = () => {
     name: '',
     city: '',
     createdAt: '',
-    userId: user?._id,
     status: "active"
   });
 
@@ -31,7 +30,10 @@ const StockList: React.FC = () => {
 
   const getListHouseware = async () => {
     try {
-      const stockList = await housewareService.getListHouseware({ ...filters, userId: user?._id });
+      const stockList = await housewareService.getListHouseware({ 
+        ...filters, 
+        ...(user?.role !== 'admin' && {userId: user?._id}) 
+      });
       setStocks(stockList);
     } catch (error) {
       console.error('Error fetching stock list:', error);
@@ -104,7 +106,7 @@ const StockList: React.FC = () => {
   // FILTER
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value, userId: user?._id }));
+    setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -123,6 +125,15 @@ const StockList: React.FC = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  useEffect(() => {
+    setFilters({
+      name: '',
+      city: '',
+      createdAt: '',
+      status: "active"
+    });
+  }, []);
 
   return (
     <div className="bg-gray-100 font-sans">
