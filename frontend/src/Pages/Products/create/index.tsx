@@ -70,7 +70,7 @@ const handleScroll = () => {
       try {
         const activeHousewares = await housewareService.getListHouseware({
           status: 'active',
-          userId: user?._id
+          ...(user?.role !== 'admin' && {userId: user?._id}) 
         });
         activeHousewares?.length && setHousewareOptions(activeHousewares);
       } catch (error) {

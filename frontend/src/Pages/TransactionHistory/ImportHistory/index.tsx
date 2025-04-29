@@ -42,7 +42,6 @@ const ImportHistory: React.FC = () => {
       ...filter,
       ...(user?.role !== 'admin' && {userId: user?._id}) 
     });
-
     setTransactionImport(transaction);
   }
 
